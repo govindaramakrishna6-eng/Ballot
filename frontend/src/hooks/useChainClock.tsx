@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { useBlock } from "wagmi";
+import { useQuery } from "@tanstack/react-query";
+import { usePublicClient } from "wagmi";
 import { isLocalChain, targetChain } from "../config/chains";
 
 type Clock = { nowSec: number; synced: boolean };
@@ -13,7 +14,15 @@ const ClockContext = createContext<Clock>({ nowSec: Math.floor(Date.now() / 1000
  * The provider re-renders every second so countdowns tick and polls flip to Closed at zero.
  */
 export function ChainClockProvider({ children }: { children: ReactNode }) {
-  const { data: block } = useBlock({ chainId: targetChain.id, watch: true });
+  const client = usePublicClient({ chainId: targetChain.id });
+  // Plain polling of the latest block (one cheap request per interval) — explicit and easy to reason about.
+  const { data: block } = useQuery({
+    queryKey: ["ballot", targetChain.id, "latest-block"],
+    queryFn: () => client!.getBlock(),
+    enabled: Boolean(client),
+    refetchInterval: isLocalChain ? 1_000 : 4_000,
+    staleTime: 0,
+  });
   const offsetMs = useRef<number | null>(null);
   const [nowMs, setNowMs] = useState(() => Date.now());
   const [synced, setSynced] = useState(false);

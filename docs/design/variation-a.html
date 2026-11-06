@@ -1,0 +1,70 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ballot — variation-a</title><style>
+@font-face{font-family:"Fraunces Variable";src:url(../../frontend/node_modules/@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2) format("woff2");font-weight:100 900}
+@font-face{font-family:"IBM Plex Sans";src:url(../../frontend/node_modules/@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-400-normal.woff2) format("woff2");font-weight:400}
+@font-face{font-family:"IBM Plex Sans";src:url(../../frontend/node_modules/@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-600-normal.woff2) format("woff2");font-weight:600}
+@font-face{font-family:"IBM Plex Mono";src:url(../../frontend/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2) format("woff2");font-weight:400}
+@font-face{font-family:"IBM Plex Mono";src:url(../../frontend/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-600-normal.woff2) format("woff2");font-weight:600}
+
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 "IBM Plex Sans",system-ui,sans-serif}
+.wrap{max-width:46rem;margin:0 auto;padding:0 1rem}.row{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}.between{justify-content:space-between}
+.mono{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}.muted{color:var(--muted)}.small{font-size:.8rem}
+nav{display:flex;gap:1rem}nav a{color:var(--muted)}nav a.on{color:var(--ink)}
+.title{font-family:"Fraunces Variable",serif;margin:.4rem 0 .6rem;line-height:1.1}
+.desc{white-space:pre-wrap;margin:0 0 1rem}.facts{display:grid;grid-template-columns:max-content 1fr;gap:.25rem 1rem;font-size:.9rem;margin:0}
+.facts dt{color:var(--muted)}.facts dd{margin:0}.copy{font:inherit;font-size:.75rem;background:none;border:0;color:var(--muted);text-decoration:underline}
+.results ol{list-style:none;padding:0;margin:.75rem 0;display:grid;gap:.9rem}
+.rc{display:grid;grid-template-columns:max-content 1fr;gap:.2rem 1rem;margin:0;font-size:.85rem}.rc dt{color:var(--muted)}.rc dd{margin:0;min-width:0}.hash{word-break:break-all}
+.rc-foot a{color:var(--ink)}.meta-row{display:flex;gap:.6rem;align-items:center;margin-top:2rem}
+
+:root{--paper:#f4efe4;--paper-2:#ebe4d4;--ink:#1c1b18;--muted:#5d574b;--line:#cfc6b3;--accent:#1d5a3c;--accent-ink:#f4efe4}
+@media (prefers-color-scheme:dark){:root{--paper:#1b1a17;--paper-2:#24221e;--ink:#ece6d8;--muted:#a69f90;--line:#3d3a33;--accent:#5fae84;--accent-ink:#111}}
+.hdr{border-bottom:2px solid var(--ink)}.hdr .row{justify-content:space-between;padding:.8rem 0}
+.brand{font-family:"Fraunces Variable",serif;font-weight:700;font-size:1.4rem;letter-spacing:-.01em}
+.acct{border:1.5px solid var(--ink);padding:.2rem .6rem;font-size:.8rem}
+.label{display:inline-block;font:600 .68rem/1 "IBM Plex Mono",monospace;letter-spacing:.12em;text-transform:uppercase;border:1.5px solid currentColor;padding:.3rem .45rem}
+.label.open{color:var(--accent)}
+.title{font-size:2.5rem;font-weight:650;font-variation-settings:"opsz" 96}
+.h2{font-family:"Fraunces Variable",serif;font-size:1.3rem;margin:0}
+.results{margin-top:2.25rem;border-top:2px solid var(--ink);padding-top:1rem}
+.track{height:14px;background:var(--paper-2);margin-top:.3rem;border:1px solid var(--line)}.fill{height:100%;background:var(--ink)}
+.receipt{position:relative;margin-top:2rem;background:var(--paper-2);padding:1.3rem 1.3rem 1rem;
+}
+.receipt::before,.receipt::after{content:"";position:absolute;left:0;right:0;height:8px;background:radial-gradient(circle at 7px 50%,var(--paper) 4px,transparent 4.5px) 0 0/14px 8px repeat-x}
+.receipt::before{top:-4px}.receipt::after{bottom:-4px}
+.rc-title{font:600 .75rem/1 "IBM Plex Mono",monospace;letter-spacing:.2em;text-transform:uppercase;margin:0 0 .9rem}
+.stamp{position:absolute;right:1.2rem;top:1rem;transform:rotate(-8deg);color:var(--accent);border:3px double var(--accent);font:700 .9rem/1 "IBM Plex Mono",monospace;letter-spacing:.2em;text-transform:uppercase;padding:.45rem .6rem}
+</style></head><body>
+<header class="hdr"><div class="wrap row"><span class="brand">Ballot</span><nav><a class="on">Polls</a><a>Create</a><a>My votes</a></nav><span class="acct mono">0x7099…79C8</span></div></header>
+<main class="wrap">
+  <div class="meta-row"><span class="label open">Open</span><span class="mono muted">Poll #12</span></div>
+  <h1 class="title">Should the community garden add a second compost bay?</h1>
+  <p class="desc">The current bay fills up by mid-month.
+A second one costs about two weekends of volunteer time.</p>
+  <dl class="facts">
+    <dt>Created by</dt><dd><span class="mono">0xd222…5D97</span> <button class="copy">Copy</button></dd>
+    <dt>Closes</dt><dd>Nov 9, 2026, 6:00 PM IST <span class="mono">(2d 4h left)</span></dd>
+  </dl>
+  <section class="receipt">
+    <div class="stamp">Recorded</div>
+    <h2 class="rc-title">Ballot receipt</h2>
+    <dl class="rc">
+      <dt>Poll</dt><dd>#12 · Should the community garden add…</dd>
+      <dt>Choice</dt><dd>Yes, this season</dd>
+      <dt>Network</dt><dd>Sepolia (chain 11155111)</dd>
+      <dt>Block</dt><dd class="mono">12,077,546</dd>
+      <dt>Time</dt><dd>Nov 6, 2026, 9:18 PM IST</dd>
+      <dt>Tx hash</dt><dd class="mono hash">0x4482041c4a6f28dde683f181756e249cae8a2abe1f29704d1f93334fe12cbd2d</dd>
+    </dl>
+    <p class="rc-foot"><a>Verify on Etherscan</a></p>
+  </section>
+  <section class="results">
+    <div class="row between"><h2 class="h2">Live results</h2><span class="mono">47 votes total</span></div>
+    <ol>
+      <li><div class="row between"><span>Yes, this season <span class="label">Your vote</span></span><span class="mono">29 · 62%</span></div><div class="track"><div class="fill" style="width:62%"></div></div></li>
+      <li><div class="row between"><span>Yes, next spring</span><span class="mono">12 · 26%</span></div><div class="track"><div class="fill" style="width:26%"></div></div></li>
+      <li><div class="row between"><span>No</span><span class="mono">6 · 13%</span></div><div class="track"><div class="fill" style="width:13%"></div></div></li>
+    </ol>
+    <p class="small muted">Percentages are rounded and may not add up to exactly 100. Counts are exact.</p>
+  </section>
+</main>
+</body></html>

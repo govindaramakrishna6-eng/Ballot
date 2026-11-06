@@ -148,3 +148,35 @@ Assumptions I made: see Decisions.
 What the next phase needs from this one: data-testid hooks on key elements for E2E.
 Commit made: feat(frontend): wallet + data layer and core poll features
 ```
+
+---
+
+## E2E — Playwright suite (gate before Phase 7)
+
+### Decisions
+- **Fake injected wallet (EIP-1193) instead of wagmi's `mock` connector** — tests then exercise the real production path (RainbowKit "Browser Wallet" → wagmi injected connector) and can script what users do in MetaMask: reject, switch network/account, disconnect. It forwards to the Hardhat node's unlocked accounts, so no keys exist in tests. Connection state is kept in sessionStorage so it survives reloads like a real wallet.
+- **Hardhat's "doesn't have enough funds" is normalised to "insufficient funds…" in the fake wallet** — that is what geth/MetaMask return, which is what the app must understand.
+- **Wrong network is simulated by switching inside the wallet after connecting** — RainbowKit asks the wallet for the app's chain at connect time, as MetaMask would.
+- **Double-vote-by-simulation test mutes event-filter results for that page** — otherwise the live update hides the form before the click (good UX, but then the simulation path isn't exercised).
+- **@playwright/test pinned to 1.63.0** (latest is 1.65.0) — matches the Chromium build pre-installed in this environment; newer versions would need a browser download.
+- **Bug found by E2E and fixed:** wagmi `useBlock({ watch: true })` never re-polled the latest block here, so polls didn't flip to Closed after time travel. The chain clock now polls `getBlock()` with TanStack Query every 1s (local) / 4s (Sepolia).
+
+```
+STATUS REPORT
+Done: 20 Playwright E2E tests covering every section 6 edge case the user listed: create poll (incl. byte counter with Tamil,
+  duplicate blocked, near-duplicate warning, review step, navigate via PollCreated), vote + receipt, double vote blocked
+  (UI + simulation sentence), wrong network (banner, disabled with reason, switch), user rejection (neutral), insufficient
+  funds, refresh during pending tx (resumes, button disabled, then receipt), poll expiring while open (time travel → Closed
+  without refresh), zero votes ("No votes yet", no NaN), live tie then Winner only when closed, cancelled poll (no bars,
+  listed under Closed), non-creator can't cancel, not-found routes (5 variants), no-wallet read-only mode, account switch
+  re-check, disconnect mid-flow, Mine tab, my-vote mark.
+Files created/changed (paths): frontend/playwright.config.ts, frontend/vitest.config.ts, frontend/e2e/*.ts,
+  frontend/src/hooks/useChainClock.tsx, .gitignore
+How to run or verify: cd frontend && npm run e2e   (starts a fresh Hardhat node + dev server itself)
+Test/build results (actually observed): 20 passed (31.7s). First run: 12 passed / 8 failed (locator ambiguity in tests,
+  connect-time chain switch, and the real chain-clock bug above) — all fixed.
+Not done / known issues: none.
+Assumptions I made: see Decisions.
+What the next phase needs from this one: data-testid hooks must survive the restyle; rerun npm run e2e after Phase 5.
+Commit made: test(e2e): Playwright suite with scriptable injected wallet on a local Hardhat node
+```

@@ -58,3 +58,34 @@ Assumptions I made: see Decisions above.
 What the next phase needs from this one: artifacts/contracts/VotingDApp.sol/VotingDApp.json (ABI) after compile.
 Commit made: feat(contracts): VotingDApp with full test suite and gas report
 ```
+
+---
+
+## Phase 2 — Deploy (local part; Sepolia waiting on funding checkpoint)
+
+### Decisions
+- **Ops scripts are plain viem run by Node's type stripping, not `hardhat run`/Ignition** — lets us use viem's `fallback` transport across several RPCs and keeps the key in memory only.
+- **Public Sepolia RPCs: publicnode (primary) → Tenderly gateway (fallback)** — tested live; drpc's free tier no longer serves Sepolia and 1rpc returned a usage-limit error. `SEPOLIA_RPC_URL` (comma-separated) overrides.
+- **Local deploys use the Hardhat node's unlocked account #0** — no key handling for 31337 at all.
+- **Deploy and verify both use the `production` build profile (optimizer, 200 runs)** — deploy gas 1,261,558 vs 2,030,711 unoptimized; verification must match the deployed bytecode.
+- **Sepolia deploy waits 2 confirmations before verifying** — Sourcify/Etherscan must see the creation tx.
+- **Balance requirement: max(3× current gas price × 1.8M gas, 0.02 ETH)** — Sepolia gas spikes; 0.02 is a safe floor.
+- **new-wallet refuses to overwrite an existing key (unless --force)** — never orphan a funded wallet.
+- **Sandbox note:** Node's fetch ignores HTTPS_PROXY here, so Sepolia scripts were run with `NODE_USE_ENV_PROXY=1`. Not needed on a normal machine.
+
+```
+STATUS REPORT (partial — stopped at the funding checkpoint)
+Done: wallet generator, balance check, deploy (local+Sepolia, writes deployments.json + typed abi.ts,
+  Sourcify verify + optional Etherscan), verify retry script, smoke test script. Local deploy + smoke run.
+Files created/changed (paths): contracts/scripts/{new-wallet,balance,deploy,verify,smoke}.ts,
+  contracts/scripts/lib/{config,deployments}.ts, contracts/hardhat.config.ts, contracts/tsconfig.json,
+  contracts/package.json, contracts/.env.example, frontend/src/contract/{deployments.json,abi.ts}
+How to run or verify: npm run node (terminal 1); npm run deploy:local && npm run smoke:local (terminal 2)
+Test/build results (actually observed): local deploy OK (block 1, gas 1,261,558); smoke: createPoll success,
+  poll id 1 from PollCreated, vote success, Yes=1 No=0, getVotedOption=1, "Smoke test PASSED."
+  tsc --noEmit OK. Sepolia balance check: 0 SepoliaETH → TOO LOW.
+Not done / known issues: Sepolia deploy, verify, smoke — waiting for funds.
+Assumptions I made: see Decisions.
+What the next phase needs from this one: deployments.json["11155111"] after Sepolia deploy.
+Commit made: feat(contracts): deploy, verify, wallet and smoke-test scripts
+```

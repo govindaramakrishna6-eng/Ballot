@@ -5,8 +5,17 @@
   "type": "module",
   "scripts": {
     "compile": "hardhat compile",
+    "compile:prod": "hardhat compile --build-profile production",
     "test": "hardhat test",
-    "node": "hardhat node"
+    "test:gas": "hardhat test --gas-stats",
+    "node": "hardhat node",
+    "wallet:new": "node scripts/new-wallet.ts",
+    "balance:sepolia": "node scripts/balance.ts",
+    "deploy:local": "npm run compile:prod && node scripts/deploy.ts localhost",
+    "deploy:sepolia": "npm run compile:prod && node scripts/deploy.ts sepolia",
+    "verify:sepolia": "node scripts/verify.ts",
+    "smoke:local": "node scripts/smoke.ts localhost",
+    "smoke:sepolia": "node scripts/smoke.ts sepolia"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox-viem": "5.0.7",

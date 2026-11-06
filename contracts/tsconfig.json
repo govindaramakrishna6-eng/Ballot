@@ -4,8 +4,13 @@
     "module": "node20",
     "target": "es2023",
     "skipLibCheck": true,
-    "outDir": "dist",
     "types": ["node"],
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
+    "strict": true,
+    // Scripts run directly with Node's built-in type stripping, which needs explicit .ts imports
+    // and only "erasable" TypeScript (no enums/namespaces). tsc is used for type checking only.
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true
   }
 }

@@ -226,3 +226,28 @@ Assumptions I made: system-preference dark mode only (no manual toggle — not r
 What the next phase needs from this one: class names (.label, .ledger, .receipt…) for the /me page.
 Commit made: feat(design): apply "civic paper" variation A with dark mode and stamp animation
 ```
+
+---
+
+## Phase 6 — Extras: /me, share link, ENS
+
+### Decisions
+- **ENS via a separate read-only mainnet client** (`VITE_MAINNET_RPC_URL`, default publicnode) — names live on mainnet, polls on Sepolia; the wallet is never involved. viem's `getEnsName` verifies the forward record, so a spoofed reverse record is ignored.
+- **ENS lookups disabled on the local chain** — Hardhat test accounts have no names and E2E stays offline. Verified live instead: 0xd8dA…6045 → `vitalik.eth`; the deployer → null (address shown).
+- **The copy button always copies the address, never the name** — the address is the identity; the name is a convenience.
+- **Share uses the native share sheet only on touch devices, clipboard elsewhere** — desktop share sheets are inconsistent; a copied link is predictable.
+- **/me reuses the poll list + one batched getVotedOption read** — exactly the spec ("batched getVotedOption calls over loaded polls"); no new contract reads or indexer.
+
+```
+STATUS REPORT
+Done: /me page (connect prompt, skeletons, error/RPC-down, empty invitation, list with "Your choice"); share link on
+  poll page; ENS names wherever an address is shown (with copy of the raw address).
+Files created/changed (paths): frontend/src/pages/MyVotes.tsx, hooks/useEnsName.ts, components/{Address,ShareButton,
+  PollCard,Layout}.tsx, App.tsx, pages/PollDetail.tsx, e2e/extras.spec.ts
+How to run or verify: npm run e2e (extras.spec.ts); /me in the app
+Test/build results (actually observed): E2E 22 passed (36.3s); vitest 21 passed; build OK; live ENS check printed vitalik.eth.
+Not done / known issues: none.
+Assumptions I made: see Decisions.
+What the next phase needs from this one: nothing.
+Commit made: feat(frontend): my-votes page, share link and ENS names
+```

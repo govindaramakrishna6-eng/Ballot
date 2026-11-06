@@ -24,6 +24,9 @@ export function Layout() {
             <NavLink to="/create" className={nav}>
               Create
             </NavLink>
+            <NavLink to="/me" className={nav}>
+              My votes
+            </NavLink>
           </nav>
           <ConnectButton chainStatus="icon" showBalance={false} accountStatus="address" />
         </div>

@@ -4,6 +4,7 @@ import { useAccount } from "wagmi";
 import { Address } from "../components/Address";
 import { Receipt, type ReceiptData } from "../components/Receipt";
 import { Results } from "../components/Results";
+import { ShareButton } from "../components/ShareButton";
 import { Skeleton } from "../components/Skeleton";
 import { ErrorState, NotFound } from "../components/States";
 import { StatusPill } from "../components/StatusPill";
@@ -95,6 +96,9 @@ function PollView({ poll }: { poll: Poll }) {
         {poll.title}
       </h1>
       {poll.description && <p className="mt-3 whitespace-pre-wrap break-words">{poll.description}</p>}
+      <div className="mt-4">
+        <ShareButton path={`/poll/${poll.id}`} title={poll.title} />
+      </div>
 
       <dl className="meta mt-4 text-sm">
         <dt>Created by</dt>

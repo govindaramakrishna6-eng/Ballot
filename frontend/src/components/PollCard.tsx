@@ -6,7 +6,7 @@ import { pollStatus } from "../lib/status";
 import { useChainClock } from "../hooks/useChainClock";
 import { StatusPill } from "./StatusPill";
 
-export function PollCard({ poll, myVote }: { poll: Poll; myVote: number | undefined }) {
+export function PollCard({ poll, myVote, myChoice }: { poll: Poll; myVote: number | undefined; myChoice?: string }) {
   const { nowSec } = useChainClock();
   const status = pollStatus(poll, nowSec);
   const r = computeResults(poll.options, poll.voteCounts);
@@ -42,6 +42,11 @@ export function PollCard({ poll, myVote }: { poll: Poll; myVote: number | undefi
           </span>
         )}
         {myVote ? <span className="label" data-testid="my-vote-mark">You voted</span> : null}
+        {myChoice !== undefined && (
+          <span className="truncate" title={myChoice} data-testid="my-choice">
+            Your choice: {myChoice}
+          </span>
+        )}
       </p>
     </li>
   );

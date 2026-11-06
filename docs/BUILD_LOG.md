@@ -89,3 +89,24 @@ Assumptions I made: see Decisions.
 What the next phase needs from this one: deployments.json["11155111"] after Sepolia deploy.
 Commit made: feat(contracts): deploy, verify, wallet and smoke-test scripts
 ```
+
+### Phase 2 — Sepolia completion (after "funded")
+
+- **Sepolia deploy gas is ~7× the local figure (8,849,248 vs 1,261,558)** — same 5,588-byte runtime code (Sourcify bytecode match confirms it). Sepolia's current fork prices new state/code far higher than Hardhat's local EDR simulation (block gas limit is now ~200M). At 19 wei/gas it cost 0.00000000017 ETH, so no action; local gas numbers from Phase 1 are relative, not absolute, on Sepolia.
+- Sepolia poll #1 is the smoke-test poll ("Smoke test: does the ballot box work?"), left on-chain as a real example.
+
+```
+STATUS REPORT
+Done: Sepolia deploy, Sourcify verification, Sepolia smoke test.
+Files created/changed (paths): frontend/src/contract/deployments.json (11155111 entry)
+How to run or verify: https://sepolia.etherscan.io/address/0x5dD2Dd61c5615E027b1E3FA5c915Aef473c0D844 ;
+  https://sourcify.dev/server/repo-ui/11155111/0x5dD2Dd61c5615E027b1E3FA5c915Aef473c0D844 ; npm run smoke:sepolia
+Test/build results (actually observed): balance 0.05 SepoliaETH → OK. Deployed 0x5dD2Dd61c5615E027b1E3FA5c915Aef473c0D844
+  in block 12077541 (tx 0x4775f425…de0e). "Contract verified successfully on Sourcify!".
+  Smoke: createPoll success block 12077545, poll id 1, vote success block 12077546, Yes=1 No=0, PASSED.
+Not done / known issues: Etherscan verification skipped (no ETHERSCAN_API_KEY) — Sourcify verified source is
+  readable through Etherscan's "similar match"/Sourcify integration or the Sourcify link.
+Assumptions I made: none new.
+What the next phase needs from this one: deployments.json with 31337 and 11155111; abi.ts.
+Commit made: chore(deploy): VotingDApp deployed and verified on Sepolia
+```

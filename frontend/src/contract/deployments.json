@@ -4,5 +4,11 @@
     "deployBlock": 4,
     "txHash": "0x0817b5502071a0eaf965e336eeb8a07be4875772bc74074ff386b5ec0795cbdb",
     "deployedAt": "2026-11-06T15:41:22.827Z"
+  },
+  "11155111": {
+    "address": "0x5dD2Dd61c5615E027b1E3FA5c915Aef473c0D844",
+    "deployBlock": 12077541,
+    "txHash": "0x4775f4256a42680dd8005bada74215eecd3be99364951b142eed6a9f96c9de0e",
+    "deployedAt": "2026-11-06T15:47:39.874Z"
   }
 }

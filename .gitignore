@@ -1,0 +1,27 @@
+# Secrets: never commit. Only the empty templates are tracked.
+.env
+.env.*
+!.env.example
+*.local
+
+# Dependencies
+node_modules/
+
+# Build output
+frontend/dist/
+frontend/dist-ssr/
+
+# Hardhat build artifacts and caches
+contracts/artifacts/
+contracts/cache/
+contracts/types/
+contracts/coverage/
+# Local (chainId 31337) Ignition deployments are throwaway; Sepolia ones are kept for the record.
+contracts/ignition/deployments/chain-31337/
+
+# Logs and OS/editor noise
+*.log
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json

@@ -1,0 +1,18 @@
+{
+  "name": "ballot-contracts",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "node": "hardhat node"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox-viem": "5.0.7",
+    "@types/node": "22.20.5",
+    "hardhat": "3.21.2",
+    "typescript": "6.0.3",
+    "viem": "2.57.16"
+  }
+}

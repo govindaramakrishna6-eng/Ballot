@@ -110,3 +110,41 @@ Assumptions I made: none new.
 What the next phase needs from this one: deployments.json with 31337 and 11155111; abi.ts.
 Commit made: chore(deploy): VotingDApp deployed and verified on Sepolia
 ```
+
+---
+
+## Phases 3 + 4 — Wallet/data layer and core features
+
+### Decisions
+- **Phases 3 and 4 committed together** — the data layer was built against the real pages to avoid throwaway screens; both reports are combined below.
+- **One target chain per build (`VITE_CHAIN`: sepolia default, localhost for dev/E2E)** — "wrong network" is simply "wallet chain ≠ target chain".
+- **All env vars optional with public defaults; malformed values stop the app on a startup screen naming the variable** — the user asked for zero-signup defaults, so "missing" can no longer be an error but "broken" still is.
+- **Injected wallets only unless `VITE_WALLETCONNECT_PROJECT_ID` is set**; with no wallet installed we show a plain hint + MetaMask download link (RainbowKit's injected-only list would otherwise be empty).
+- **Simulation is done imperatively (`simulateContract` action) at click time** instead of the `useSimulateContract` hook — the args (chosen option, form values) are only final on click, and it keeps every write in one code path (`useTx`).
+- **Chain clock = max of (block timestamp − time seen) over new blocks; on the local node never below 0** — Hardhat mines only on demand, so an old block there says nothing about "now".
+- **Receipt is rebuilt from the on-chain `Voted` log**, not localStorage — the proof survives cleared storage and other devices.
+- **Reads use TanStack Query + viem with our own keys (`["ballot", chainId, …]`)** so event-driven invalidation can target exactly one poll; http transport `batch: true` folds parallel reads into one request.
+- **Create form keeps a 60s safety margin inside the 5 min / 30 day bounds** (shown as "6 minutes") so a deadline valid at click time doesn't revert by inclusion time.
+- **Cancelled polls are listed under the Closed tab.**
+- **`deployedAt` dropped from deployments.json** — local deploys on a fresh node are now byte-identical (same address, same tx hash), so tests don't churn a tracked file.
+- **3 oxlint "only-export-components" warnings left** — provider + hook live together on purpose; it only affects hot reload.
+
+```
+STATUS REPORT
+Done: env validation + startup error screen; not-deployed screen; wagmi/RainbowKit (injected by default, WalletConnect optional);
+  chain-time clock; live updates (Voted/PollCreated/PollCancelled watchers, dedupe by tx+logIndex, 12s polling fallback);
+  shared useTx (simulate → wallet → pending in localStorage → confirmed/failed with decoded reason; neutral rejection;
+  faucet link on insufficient funds; aria-live announcements); wrong-network banner + switch; write gate with reasons;
+  pages /, /create (byte counters, add/remove rows, dup block, near-dup warning, presets, review step, navigate by event),
+  /poll/:id (vote, results, Tied/Winner, cancelled state, cancel for creator, ballot receipt), not-found routes; error boundary.
+Files created/changed (paths): frontend/src/{App,main}.tsx, index.css, config/*, contract/contract.ts, hooks/*, lib/*,
+  components/*, pages/*, lib/__tests__/*; contracts/scripts/deploy.ts, scripts/lib/deployments.ts
+How to run or verify: npm run node + npm run deploy:local (contracts); VITE_CHAIN=localhost npm run dev (frontend); npm test; npm run build
+Test/build results (actually observed): vitest 21/21 passed; tsc -b clean; vite build OK; Chromium render check of /, /poll/1,
+  /poll/999, /create on the local node AND live Sepolia (read-only, public RPC) — all rendered with data, no console errors
+  after fixing an Intl.DateTimeFormat option clash found by that check.
+Not done / known issues: full wallet flows verified by the Playwright suite (next).
+Assumptions I made: see Decisions.
+What the next phase needs from this one: data-testid hooks on key elements for E2E.
+Commit made: feat(frontend): wallet + data layer and core poll features
+```

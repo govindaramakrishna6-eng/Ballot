@@ -34,7 +34,6 @@ writeDeployment(chainId, {
   address,
   deployBlock: Number(receipt.blockNumber),
   txHash,
-  deployedAt: new Date().toISOString(),
 });
 writeAbi(abi);
 console.log(`Deployed at ${address} in block ${receipt.blockNumber} (gas used ${receipt.gasUsed}).`);

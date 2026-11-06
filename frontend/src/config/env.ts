@@ -1,0 +1,72 @@
+// Every VITE_* value is bundled into public JS. Nothing secret may live here.
+// All variables are optional (public defaults exist); a value that IS set but malformed
+// stops the app on a startup screen that names the variable, instead of failing later.
+
+export const DEFAULT_SEPOLIA_RPCS = [
+  "https://ethereum-sepolia-rpc.publicnode.com",
+  "https://sepolia.gateway.tenderly.co",
+];
+export const DEFAULT_MAINNET_RPC = "https://ethereum-rpc.publicnode.com";
+const DEFAULT_LOCAL_RPC = "http://127.0.0.1:8545";
+
+export type AppEnv = {
+  chain: "sepolia" | "localhost";
+  sepoliaRpcUrls: string[];
+  localRpcUrl: string;
+  mainnetRpcUrl: string;
+  walletConnectProjectId: string | null;
+};
+
+export type EnvProblem = { name: string; problem: string };
+
+function urlList(raw: string | undefined): string[] {
+  return (raw ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+}
+
+function isHttpUrl(s: string): boolean {
+  try {
+    return ["http:", "https:"].includes(new URL(s).protocol);
+  } catch {
+    return false;
+  }
+}
+
+export function readEnv(source: Record<string, string | undefined> = import.meta.env): { env: AppEnv; problems: EnvProblem[] } {
+  const problems: EnvProblem[] = [];
+
+  const chainRaw = source.VITE_CHAIN?.trim() || "sepolia";
+  if (chainRaw !== "sepolia" && chainRaw !== "localhost") {
+    problems.push({ name: "VITE_CHAIN", problem: 'must be "sepolia" or "localhost".' });
+  }
+
+  const sepolia = urlList(source.VITE_SEPOLIA_RPC_URL);
+  if (sepolia.some((u) => !isHttpUrl(u))) {
+    problems.push({ name: "VITE_SEPOLIA_RPC_URL", problem: "must be an http(s) URL (comma-separate several for fallback)." });
+  }
+
+  const local = source.VITE_LOCAL_RPC_URL?.trim() || DEFAULT_LOCAL_RPC;
+  if (!isHttpUrl(local)) problems.push({ name: "VITE_LOCAL_RPC_URL", problem: "must be an http(s) URL." });
+
+  const mainnet = source.VITE_MAINNET_RPC_URL?.trim() || DEFAULT_MAINNET_RPC;
+  if (!isHttpUrl(mainnet)) problems.push({ name: "VITE_MAINNET_RPC_URL", problem: "must be an http(s) URL." });
+
+  const wc = source.VITE_WALLETCONNECT_PROJECT_ID?.trim() || null;
+  if (wc && !/^[0-9a-f]{32}$/i.test(wc)) {
+    problems.push({ name: "VITE_WALLETCONNECT_PROJECT_ID", problem: "must be the 32-character id from cloud.reown.com, or left empty." });
+  }
+
+  return {
+    env: {
+      chain: chainRaw === "localhost" ? "localhost" : "sepolia",
+      sepoliaRpcUrls: sepolia.length ? sepolia : DEFAULT_SEPOLIA_RPCS,
+      localRpcUrl: local,
+      mainnetRpcUrl: mainnet,
+      walletConnectProjectId: wc,
+    },
+    problems,
+  };
+}
+
+const result = readEnv();
+export const env = result.env;
+export const envProblems = result.problems;

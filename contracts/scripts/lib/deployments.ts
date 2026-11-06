@@ -9,7 +9,7 @@ export const FRONTEND_CONTRACT_DIR = resolve(CONTRACTS_DIR, "../frontend/src/con
 const DEPLOYMENTS_PATH = resolve(FRONTEND_CONTRACT_DIR, "deployments.json");
 const ABI_PATH = resolve(FRONTEND_CONTRACT_DIR, "abi.ts");
 
-export type Deployment = { address: Address; deployBlock: number; txHash: Hash; deployedAt: string };
+export type Deployment = { address: Address; deployBlock: number; txHash: Hash };
 export type Deployments = Record<string, Deployment>; // keyed by chainId (JSON keys are strings)
 
 export function readDeployments(): Deployments {

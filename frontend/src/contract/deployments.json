@@ -1,14 +1,12 @@
 {
   "31337": {
-    "address": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
-    "deployBlock": 4,
-    "txHash": "0x0817b5502071a0eaf965e336eeb8a07be4875772bc74074ff386b5ec0795cbdb",
-    "deployedAt": "2026-11-06T15:41:22.827Z"
+    "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "deployBlock": 1,
+    "txHash": "0x6723171191c6b6ad5fdbf913f8fdbdc8a64f28e12db4bc9410d0dc5f9c524271"
   },
   "11155111": {
     "address": "0x5dD2Dd61c5615E027b1E3FA5c915Aef473c0D844",
     "deployBlock": 12077541,
-    "txHash": "0x4775f4256a42680dd8005bada74215eecd3be99364951b142eed6a9f96c9de0e",
-    "deployedAt": "2026-11-06T15:47:39.874Z"
+    "txHash": "0x4775f4256a42680dd8005bada74215eecd3be99364951b142eed6a9f96c9de0e"
   }
 }

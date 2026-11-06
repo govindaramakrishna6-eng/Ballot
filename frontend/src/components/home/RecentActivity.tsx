@@ -7,8 +7,9 @@ import { buildFeed, type FeedItem } from "../../lib/activity";
 import { pluralVotes, shortAddress } from "../../lib/format";
 import { relativeTime } from "../../lib/relativeTime";
 import { Skeleton } from "../Skeleton";
+import { LatestReceipt } from "./LatestReceipt";
 
-const SHOWN = 9;
+const SHOWN = 8;
 
 function Sentence({ item }: { item: FeedItem }) {
   const q = <span className="note-quote">‘{item.poll.title}’</span>;
@@ -54,41 +55,46 @@ export function RecentActivity({ chain, polls, loading, failed }: { chain: Chain
           <span className="pulse-dot" /> Live
         </span>
       </div>
+      <div className="activity-layout">
+        {loading ? <Skeleton className="h-64 w-full" /> : <LatestReceipt chain={chain} polls={polls} />}
+        <div className="min-w-0">
       {loading ? (
-        <ul className="note-grid" aria-label="Loading activity">
-          {[0, 1, 2].map((i) => (
-            <li key={i} className="note">
-              <Skeleton className="h-4 w-5/6" />
-              <Skeleton className="mt-2 h-4 w-1/2" />
-            </li>
-          ))}
-        </ul>
-      ) : failed ? (
-        <p className="hint">Recent activity isn't available right now. Polls and results still work.</p>
-      ) : feed.length === 0 ? (
-        <p className="hint">It's quiet so far. Votes and new polls will show up here as they happen.</p>
-      ) : (
-        <ul className="note-grid" data-testid="activity">
-          {feed.map((item) => (
-            <li key={item.id} className={fresh.has(item.id) ? "note-in" : ""}>
-              <Link to={`/poll/${item.poll.id}`} className={`note note-${item.kind}`} data-testid={`activity-${item.kind}`}>
-                <span className="note-text">
-                  <Sentence item={item} />
-                </span>
-                <span className="note-meta">
-                  {item.actor && (
-                    <span className="mono" title={item.actor}>
-                      {shortAddress(item.actor)}
+            <ul className="note-grid" aria-label="Loading activity">
+              {[0, 1, 2].map((i) => (
+                <li key={i} className="note">
+                  <Skeleton className="h-4 w-5/6" />
+                  <Skeleton className="mt-2 h-4 w-1/2" />
+                </li>
+              ))}
+            </ul>
+          ) : failed ? (
+            <p className="hint">Recent activity isn't available right now. Polls and results still work.</p>
+          ) : feed.length === 0 ? (
+            <p className="hint">It's quiet so far. Votes and new polls will show up here as they happen.</p>
+          ) : (
+            <ul className="note-grid" data-testid="activity">
+              {feed.map((item) => (
+                <li key={item.id} className={fresh.has(item.id) ? "note-in" : ""}>
+                  <Link to={`/poll/${item.poll.id}`} className={`note note-${item.kind}`} data-testid={`activity-${item.kind}`}>
+                    <span className="note-text">
+                      <Sentence item={item} />
                     </span>
-                  )}
-                  {item.actor && item.at !== null && <span aria-hidden="true">·</span>}
-                  {item.at !== null && <span>{relativeTime(item.at, nowSec)}</span>}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+                    <span className="note-meta">
+                      {item.actor && (
+                        <span className="mono" title={item.actor}>
+                          {shortAddress(item.actor)}
+                        </span>
+                      )}
+                      {item.actor && item.at !== null && <span aria-hidden="true">·</span>}
+                      {item.at !== null && <span>{relativeTime(item.at, nowSec)}</span>}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
     </section>
   );
 }

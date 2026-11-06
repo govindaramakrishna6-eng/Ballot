@@ -60,7 +60,7 @@ flowchart LR
 | `frontend/src/hooks/useTx.ts` | The single path every write goes through (simulate, wallet, pending saved across refresh, decoded errors). |
 | `frontend/src/lib/errors.ts` | Turns contract errors like `AlreadyVoted` into sentences like "This wallet has already voted in this poll." |
 | `frontend/src/pages/` | Homepage (hero → open polls → recent activity → live stats), all polls (`/polls`), create form, poll page, my votes. |
-| `frontend/e2e/` | 27 browser tests against a local blockchain, with a scriptable fake wallet. |
+| `frontend/e2e/` | 29 browser tests against a local blockchain, with a scriptable fake wallet. |
 | `docs/BUILD_LOG.md` | Every phase's status report and every decision made along the way. |
 | `docs/screenshots/` | The finished app, light and dark. |
 
@@ -108,7 +108,7 @@ To vote locally, add network `http://127.0.0.1:8545` (chain id 31337) to MetaMas
 | Contract | `cd contracts && npm test` | 45 |
 | Contract gas report | `cd contracts && npm run test:gas` | — |
 | Frontend unit | `cd frontend && npm test` | 26 |
-| End-to-end (starts its own chain + server) | `cd frontend && npm run e2e` | 27 |
+| End-to-end (starts its own chain + server) | `cd frontend && npm run e2e` | 29 |
 | Type check / build | `cd frontend && npm run typecheck && npm run build` | — |
 
 The end-to-end tests cover: creating a poll, voting, double votes, wrong network, rejecting in the wallet, not enough ETH,

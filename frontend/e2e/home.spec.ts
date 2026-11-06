@@ -72,3 +72,30 @@ test.describe("Homepage", () => {
     await expect(page.getByTestId("network-indicator")).toContainText(/Hardhat • \d/);
   });
 });
+
+test.describe("Homepage — latest ballot receipt", () => {
+  test("shows the newest real vote as a stamped receipt that links to its poll", async ({ page }) => {
+    const title = `Receipt link ${Date.now()}`;
+    const id = await chain.createPoll({ title, options: ["Filter coffee", "Tea"] });
+    await chain.vote(id, 0, 18);
+    await page.goto("/");
+    const receipt = page.getByTestId("latest-receipt");
+    await expect(receipt).toContainText("Recorded");
+    await expect(receipt).toContainText(title);
+    await expect(receipt).toContainText("Filter coffee");
+    await expect(receipt).toContainText(/0x[0-9a-f]{8}…[0-9a-f]{6}/);
+    await receipt.getByTestId("latest-receipt-poll").click();
+    await expect(page).toHaveURL(new RegExp(`/poll/${id}$`));
+  });
+
+  test("headline uses the wordmark's typeface settings", async ({ page }) => {
+    await page.goto("/");
+    const style = (sel: string) =>
+      page.$eval(sel, (e) => {
+        const c = getComputedStyle(e);
+        return { family: c.fontFamily, weight: c.fontWeight };
+      });
+    expect(await style(".hero-title")).toEqual(await style(".brand"));
+    expect(await page.$eval(".hero-title", (e) => getComputedStyle(e).fontVariationSettings)).toContain('"opsz" 23');
+  });
+});

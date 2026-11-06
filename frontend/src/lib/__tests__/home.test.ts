@@ -43,7 +43,7 @@ describe("rankOpenPolls", () => {
 
 describe("buildFeed", () => {
   const ev = (id: string, kind: ChainEvent["kind"], pollId: number, block: number): ChainEvent => ({
-    id, kind, pollId: BigInt(pollId), actor: kind === "cancelled" ? null : B, txHash: `0x${"1".repeat(64)}`, blockNumber: BigInt(block),
+    id, kind, pollId: BigInt(pollId), actor: kind === "cancelled" ? null : B, optionIndex: kind === "vote" ? 0 : null, txHash: `0x${"1".repeat(64)}`, blockNumber: BigInt(block),
   });
 
   it("merges events with recently closed polls, newest first, and drops unknown polls", () => {
@@ -63,8 +63,8 @@ describe("buildFeed", () => {
 describe("uniqueWallets", () => {
   it("counts creators and voters once each, case-insensitively", () => {
     const events: ChainEvent[] = [
-      { id: "1", kind: "vote", pollId: 1n, actor: B, txHash: `0x${"1".repeat(64)}`, blockNumber: 1n },
-      { id: "2", kind: "vote", pollId: 1n, actor: B.toUpperCase().replace("0X", "0x") as `0x${string}`, txHash: `0x${"2".repeat(64)}`, blockNumber: 2n },
+      { id: "1", kind: "vote", pollId: 1n, actor: B, optionIndex: 0, txHash: `0x${"1".repeat(64)}`, blockNumber: 1n },
+      { id: "2", kind: "vote", pollId: 1n, actor: B.toUpperCase().replace("0X", "0x") as `0x${string}`, optionIndex: 1, txHash: `0x${"2".repeat(64)}`, blockNumber: 2n },
     ];
     expect(uniqueWallets([poll(1), poll(2)], events)).toBe(2);
   });

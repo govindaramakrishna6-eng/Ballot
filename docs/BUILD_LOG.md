@@ -354,3 +354,22 @@ Test/build results (actually observed): vitest 26 passed; tsc OK; oxlint 0 new i
 Not done / known issues: none new. No backend, contract or wallet-flow code changed.
 Commit made: feat(frontend): product homepage — centred hero, open polls grid, activity feed, live stats
 ```
+
+---
+
+## Homepage tweaks: wordmark typeface for the headline, latest-ballot receipt back
+
+### Decisions
+- **Headline set exactly like the "Ballot" wordmark** — same family and weight (Fraunces 700) and the wordmark's optical cut (`opsz` 23, measured from its computed style) and -0.01em tracking, instead of the high-contrast `opsz` 144 display cut. The wider letterforms needed a wider hero block (76rem) to keep two lines on desktop.
+- **Latest-ballot receipt returned inside "Recent activity"** (left column on desktop, above the notes on mobile) so the requested section order is unchanged. It shows the newest real vote: poll title links to the poll, footer links to the transaction on Etherscan (on the local chain: "Open this poll"); a "Specimen" receipt shows before any vote exists. Tilted, perforated, stamped "Recorded"; straightens on hover; stamp animation off under reduced motion.
+
+```
+STATUS REPORT
+Done: headline typeface matches the wordmark; latest-ballot receipt with links on the homepage.
+Files created/changed (paths): frontend/src/index.css, components/home/{LatestReceipt,RecentActivity}.tsx, hooks/useActivity.ts,
+  lib/__tests__/home.test.ts, e2e/home.spec.ts, README.md, docs/screenshots/*
+How to run or verify: npm run dev → /; npm run e2e
+Test/build results (actually observed): vitest 26 passed; tsc OK; oxlint 0 new; build OK; E2E 29 passed (46.7s);
+  hero centre 450/450 at 1440×900 and 422.35/422 at 390×844; headline 2 lines on desktop; no sideways scroll at 390px.
+Commit made: feat(frontend): wordmark typeface for the headline; latest-ballot receipt on the homepage
+```

@@ -11,6 +11,8 @@ export type ChainEvent = {
   kind: "vote" | "created" | "cancelled";
   pollId: bigint;
   actor: Address | null;
+  /** Chosen option for votes; null for other events. */
+  optionIndex: number | null;
   txHash: Hash;
   blockNumber: bigint;
 };
@@ -51,11 +53,11 @@ export function useChainEvents() {
           const base = { id: `${log.transactionHash}:${log.logIndex}`, txHash: log.transactionHash, blockNumber: log.blockNumber };
           switch (log.eventName) {
             case "Voted":
-              return [{ ...base, kind: "vote", pollId: log.args.pollId!, actor: log.args.voter! }];
+              return [{ ...base, kind: "vote", pollId: log.args.pollId!, actor: log.args.voter!, optionIndex: Number(log.args.optionIndex) }];
             case "PollCreated":
-              return [{ ...base, kind: "created", pollId: log.args.pollId!, actor: log.args.creator! }];
+              return [{ ...base, kind: "created", pollId: log.args.pollId!, actor: log.args.creator!, optionIndex: null }];
             case "PollCancelled":
-              return [{ ...base, kind: "cancelled", pollId: log.args.pollId!, actor: null }];
+              return [{ ...base, kind: "cancelled", pollId: log.args.pollId!, actor: null, optionIndex: null }];
             default:
               return [];
           }

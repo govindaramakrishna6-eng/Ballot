@@ -223,14 +223,16 @@ input[type="datetime-local"].input { width: auto; }
 .hero { min-height: calc(100svh - var(--chrome) - var(--peek)); display: grid; place-items: center; text-align: center; padding: 2rem 0 0; }
 /* A grid item's margin moves its centre by half that amount; this offset puts the block's centre at the
    exact centre of the viewport (not of the area below the header, and despite the peek). */
-.hero-inner { max-width: 60rem; margin-top: calc(var(--peek) - var(--chrome) - 2rem); }
+.hero-inner { max-width: 76rem; margin-top: calc(var(--peek) - var(--chrome) - 2rem); }
+/* Same face as the "Ballot" wordmark: Fraunces 700 with the wordmark's small-size optical cut
+   (opsz 23, sturdier and lower-contrast than the display cut) and its -0.01em tracking — just bigger. */
 .hero-title {
   font-family: var(--serif);
   font-weight: 700;
-  font-variation-settings: "opsz" 144, "SOFT" 0;
-  font-size: clamp(3rem, 8.6vw, 7.25rem);
-  line-height: .96;
-  letter-spacing: -0.02em;
+  font-variation-settings: "opsz" 23;
+  font-size: clamp(2.8rem, 7.6vw, 6.25rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
   text-wrap: balance;
 }
 .hero-sub { margin: 1.6rem auto 0; max-width: 34rem; font-size: clamp(1.1rem, 2.2vw, 1.35rem); line-height: 1.5; color: var(--muted); text-wrap: balance; }
@@ -295,3 +297,27 @@ input[type="datetime-local"].input { width: auto; }
 .stat-label { font-size: .85rem; color: var(--muted); }
 
 .site-footer { border-top: 1px solid var(--line); margin-top: 3rem; }
+
+/* Latest ballot: the newest real vote as a tilted, stamped paper receipt beside the activity notes. */
+.activity-layout { display: grid; gap: 2rem; align-items: start; }
+@media (min-width: 960px) { .activity-layout { grid-template-columns: 22rem minmax(0, 1fr); gap: 2.5rem; } }
+.hero-receipt {
+  position: relative;
+  background: var(--paper-2);
+  padding: 1.6rem 1.4rem 1.2rem;
+  transform: rotate(-1.4deg);
+  box-shadow: 0 1px 0 var(--line), 0 18px 30px -22px rgb(0 0 0 / .45);
+  transition: transform .2s ease;
+}
+.hero-receipt:hover, .hero-receipt:focus-within { transform: rotate(0); }
+.hero-receipt::before, .hero-receipt::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 8px;
+  background: radial-gradient(circle at 7px 50%, var(--paper) 4px, transparent 4.5px) 0 0 / 14px 8px repeat-x;
+}
+.hero-receipt::before { top: -4px; }
+.hero-receipt::after { bottom: -4px; }
+.hero-receipt .receipt-grid dd { min-width: 0; }
+.stamp-hero { top: 1.1rem; right: 1rem; }
+@media (prefers-reduced-motion: no-preference) {
+  .hero-receipt .stamp { animation: stamp-in 420ms cubic-bezier(.2, 1.4, .4, 1) 300ms both; }
+}

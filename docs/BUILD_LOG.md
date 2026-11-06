@@ -251,3 +251,38 @@ Assumptions I made: see Decisions.
 What the next phase needs from this one: nothing.
 Commit made: feat(frontend): my-votes page, share link and ENS names
 ```
+
+---
+
+## Phase 7 — Ship
+
+### Decisions
+- **Vercel deploy skipped** — the Vercel CLI is not logged in on this machine (no `~/.vercel` / CLI auth). Single command for later: `cd frontend && npx vercel@65.12.1 deploy --prod`.
+- **No Vercel env vars are required** — all `VITE_*` are optional with public defaults.
+- **`vercel.json` lives in `frontend/`** with the SPA rewrite plus three basic security headers (nosniff, referrer policy, no framing). The rewrite was not exercised on Vercel itself (no deploy); the production bundle was checked with `vite preview` deep-linking to `/poll/1`.
+- **`.nvmrc` = 22, `engines.node` = ">=22.13.0"** in both packages (Hardhat 3's minimum; also satisfies Vite 8).
+- **Audit numbers recorded in README:** frontend 30 (2 low, 12 moderate, 16 high) in wallet-connector SDKs; contracts 12 high, all the `zod` advisory inside Hardhat dev tooling.
+
+### Secret audit (actually run)
+- Real deployer key searched (value never printed) in: working tree incl. untracked files → 0; full `git log --all -p` → 0; session scratch logs → 0.
+- Tracked `.env*` files: only the two `.env.example` templates (empty values).
+- Secret-like assignments in history: only the wallet script's code (no values). "seed phrase": only the CLAUDE.md rule.
+- 64-hex strings in tracked files: three public transaction hashes only.
+- `console.log/debug/info` in frontend/src: 0. `dangerouslySetInnerHTML`: 0.
+
+```
+STATUS REPORT
+Done: beginner README (how it works, architecture diagram, repo tour, run steps, tests, contract address + links, Vercel
+  steps + env table, design decisions, known limitations incl. npm audit), vercel.json with SPA rewrite, .nvmrc, engines,
+  complete frontend .env.example, secret audit.
+Files created/changed (paths): README.md, .nvmrc, .gitignore, frontend/vercel.json, frontend/.env.example,
+  frontend/package.json, contracts/package.json, docs/BUILD_LOG.md
+How to run or verify: see README "Tests"; cd frontend && npx vercel@65.12.1 deploy --prod
+Test/build results (actually observed): contracts 45 passing; contracts tsc OK; frontend unit 21 passed; frontend tsc OK;
+  vite build OK; E2E 22 passed (35.6s); production preview /poll/1 rendered live Sepolia data with 0 page errors.
+Not done / known issues: Vercel deploy (CLI not logged in). Bundle has >500 kB chunks from wallet SDKs (works; could be
+  code-split later).
+Assumptions I made: see Decisions.
+What the next phase needs from this one: n/a — final phase.
+Commit made: docs: beginner README, Vercel config, engines and final audit
+```

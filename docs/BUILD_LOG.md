@@ -286,3 +286,11 @@ Assumptions I made: see Decisions.
 What the next phase needs from this one: n/a — final phase.
 Commit made: docs: beginner README, Vercel config, engines and final audit
 ```
+
+---
+
+## Post-ship — Vercel deploy
+
+- Deployed with a Vercel token saved by the user through the environment's secure credential form (value never seen).
+- Production URL: https://ballot-omega.vercel.app (project `ballot`, remote build on Vercel, framework Vite).
+- **Open item for the owner:** Vercel's default "Deployment Protection" (Vercel Authentication, `all_except_custom_domains`) is on, so visitors to the `*.vercel.app` URL see a Vercel login wall. Turning it off is the owner's decision: Vercel dashboard → project `ballot` → Settings → Deployment Protection → Vercel Authentication → off. Vercel also defaulted the build to Node 26.x; tests ran on Node 22 (Settings → Build → Node.js Version → 22.x to match).

@@ -10,7 +10,7 @@ from the blockchain, not from this website, so it is proof rather than decoratio
 | **Contract (Sepolia)** | [`0x5dD2Dd61c5615E027b1E3FA5c915Aef473c0D844`](https://sepolia.etherscan.io/address/0x5dD2Dd61c5615E027b1E3FA5c915Aef473c0D844) |
 | **Verified source** | [Sourcify (exact match)](https://sourcify.dev/server/repo-ui/11155111/0x5dD2Dd61c5615E027b1E3FA5c915Aef473c0D844) |
 | **Deployed in block** | 12077541 |
-| **Live site** | Not deployed yet — see [Deploy the website](#deploy-the-website-vercel) (one command) |
+| **Live site** | https://ballot-omega.vercel.app |
 
 ![Poll page with a ballot receipt](docs/screenshots/poll-light.png)
 
@@ -141,7 +141,7 @@ The deploy verifies the source on Sourcify automatically (Etherscan too, if you 
 
 ## Deploy the website (Vercel)
 
-The Vercel CLI was not logged in on the build machine, so the site isn't deployed yet. From the repo root, run:
+The site is deployed at https://ballot-omega.vercel.app (Vercel project `ballot`). To redeploy after changes:
 
 ```bash
 cd frontend && npx vercel@65.12.1 deploy --prod

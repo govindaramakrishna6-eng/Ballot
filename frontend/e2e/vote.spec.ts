@@ -24,7 +24,7 @@ test.describe("Voting", () => {
     await expect(page.getByTestId("receipt")).toContainText("Beta");
     expect((await chain.getPoll(id)).voteCounts).toEqual([0n, 1n, 0n]);
 
-    await page.goto("/");
+    await page.goto("/polls");
     await expect(page.locator(`[data-poll-id="${id}"]`).getByTestId("my-vote-mark")).toBeVisible();
   });
 

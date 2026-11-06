@@ -1,9 +1,9 @@
-import type { PollStatus } from "../lib/status";
+import type { DisplayStatus } from "../lib/status";
 
-const LABEL: Record<PollStatus, string> = { open: "Open", closed: "Closed", cancelled: "Cancelled" };
+const LABEL: Record<DisplayStatus, string> = { open: "Open", "closing-soon": "Closing soon", closed: "Closed", cancelled: "Cancelled" };
 
 /** A small printed label. The word carries the meaning; styling is secondary. */
-export function StatusPill({ status }: { status: PollStatus }) {
+export function StatusPill({ status }: { status: DisplayStatus }) {
   return (
     <span className={`label label-${status}`} data-testid="status-pill">
       {LABEL[status]}

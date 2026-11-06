@@ -19,9 +19,9 @@ for (const scheme of ["light", "dark"] as const) {
     await wallet.install({ as: 2 });
     await page.goto("/");
     await wallet.connect();
-    await expect(page.getByTestId("hero-receipt")).toBeVisible();
-    await page.waitForTimeout(1200); // receipt drop + stamp + count-up finish
-    await page.screenshot({ path: `${OUT}/list-${scheme}.png`, fullPage: true });
+    await expect(page.getByTestId("activity")).toBeVisible();
+    await page.waitForTimeout(1200); // entrance + count-up finish
+    await page.screenshot({ path: `${OUT}/home-${scheme}.png`, fullPage: true });
     await page.setViewportSize({ width: 390, height: 844 });
     await page.screenshot({ path: `${OUT}/home-mobile-${scheme}.png`, fullPage: true });
     await page.setViewportSize({ width: 1100, height: 900 });

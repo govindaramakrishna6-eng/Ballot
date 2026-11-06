@@ -1,3 +1,4 @@
+import { useLocation } from "react-router";
 import { useAccount } from "wagmi";
 
 /**
@@ -6,8 +7,10 @@ import { useAccount } from "wagmi";
  */
 export function NoWalletHint() {
   const { isConnected } = useAccount();
+  // Kept off the homepage so the hero stays clean; it appears wherever voting or creating happens.
+  const onHome = useLocation().pathname === "/";
   const hasInjected = typeof window !== "undefined" && "ethereum" in window;
-  if (isConnected || hasInjected) return null;
+  if (isConnected || hasInjected || onHome) return null;
   return (
     <p className="hint" data-testid="no-wallet">
       No wallet detected — you can browse and read results. To vote, install{" "}

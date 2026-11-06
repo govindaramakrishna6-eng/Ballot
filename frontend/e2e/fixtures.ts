@@ -38,6 +38,9 @@ export const chain = {
     const hash = await wallet.writeContract({ address: CONTRACT, abi: votingAbi, functionName: "vote", args: [pollId, BigInt(option)] });
     await publicClient.waitForTransactionReceipt({ hash });
   },
+  async getPollCount() {
+    return publicClient.readContract({ address: CONTRACT, abi: votingAbi, functionName: "pollCount" });
+  },
   async getPoll(pollId: bigint) {
     return publicClient.readContract({ address: CONTRACT, abi: votingAbi, functionName: "getPoll", args: [pollId] });
   },

@@ -12,7 +12,7 @@ test.describe("Cancel", () => {
     await expect(page.getByTestId("results-cancelled")).toBeVisible();
     await expect(page.locator(".bar-track")).toHaveCount(0);
 
-    await page.goto("/?tab=closed");
+    await page.goto("/polls?tab=closed");
     await expect(page.locator(`[data-poll-id="${id}"]`)).toContainText("Cancelled");
   });
 

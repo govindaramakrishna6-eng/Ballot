@@ -323,3 +323,34 @@ Test/build results (actually observed): tsc OK; oxlint 0 issues (excluding the 3
 Not done / known issues: activity feed only reaches ~2.8 days back on the free public RPC.
 Commit made: feat(frontend): gazette-style front page with live on-chain receipt and activity
 ```
+
+---
+
+## Homepage restructure (user brief: hero → open polls → recent activity → live stats)
+
+### Decisions
+- **Gazette masthead, "Every vote leaves a receipt", "Sepolia edition", hero receipt, featured poll removed** — per brief.
+- **Hero copy exactly as given**; "tamper‑proof" uses a non-breaking hyphen so it never splits across lines.
+- **Exact centring is measured, not guessed**: hero block centre = viewport centre to the pixel at 1440×900, 1280×720 and 390×844 (E2E asserts < 4–6px). `--chrome` = measured header + main padding (5.625rem desktop, 8.6rem mobile).
+- **"No large gap" vs "exact centre"** — reconciled by shortening the hero by `--peek` (5.5rem) and offsetting the block so it stays centred: the "Open polls" heading is visible above the fold on landing (asserted in E2E).
+- **Full list with Open/Closed/Mine tabs moved to `/polls`** (header "Polls" links there) — the homepage shows only open polls, so filters would be clutter; nothing was removed.
+- **Ranking: closing soon (< 3 h, soonest first) → most votes → newest**; homepage shows up to 9 with "See all N open polls". "Closing soon" is a printed label in the warning ink.
+- **Card action = "Vote" when you can still vote, otherwise "View poll"**; creator shows ENS name when available, else 0x1234…abcd.
+- **Recent activity as sentences** ("A wallet voted in ‘…’", "A new poll was created: ‘…’", "‘…’ closed with N votes.", "‘…’ was cancelled by its creator."). Deadlines emit no event, so "closed" items come from the poll list (last 7 days, timed at endTime). Whole note links to the poll; wallets masked; new notes slide in once.
+- **Unique wallets = poll creators (complete, from contract reads) ∪ voters in the readable log window**; shown with a "+" if the contract is older than the public RPC's ~2.8-day log window, so it's never presented as exact when it isn't.
+- **Network/time indicator moved to a quiet footer** ("● Sepolia • 11:19 PM IST • block N" + contract link); the "no wallet" hint is hidden on the homepage only, so the hero stays clean (it still shows on poll/create pages).
+- **Stats numbers in Plex Sans semibold** for a cleaner product feel; serif stays for headings.
+
+```
+STATUS REPORT
+Done: homepage rebuilt in the requested order and copy; /polls page; footer network indicator.
+Files created/changed (paths): frontend/src/pages/{Home,PollList}.tsx, components/home/{Hero,OpenPolls,OpenPollCard,
+  RecentActivity,NetworkStats}.tsx, components/{Footer,Layout,NoWalletHint,StatusPill}.tsx, hooks/useActivity.ts,
+  lib/{activity,rank,status}.ts, lib/__tests__/home.test.ts, App.tsx, index.css, e2e/{home,readonly,create,cancel,vote,
+  screenshots}.spec.ts, e2e/fixtures.ts, README.md, docs/screenshots/*
+How to run or verify: npm run dev → /; npm test; npm run e2e
+Test/build results (actually observed): vitest 26 passed; tsc OK; oxlint 0 new issues; build OK; E2E 27 passed (44.4s);
+  measured hero centre 450/450 (1440×900), 360/360 (1280×720), 422.35/422 (390×844); no horizontal scroll at 390px.
+Not done / known issues: none new. No backend, contract or wallet-flow code changed.
+Commit made: feat(frontend): product homepage — centred hero, open polls grid, activity feed, live stats
+```

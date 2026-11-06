@@ -44,7 +44,7 @@ test.describe("Create poll", () => {
   test("Mine tab lists polls created by the connected wallet", async ({ page, wallet }) => {
     const mine = await chain.createPoll({ from: 6, title: `Mine ${Date.now()}` });
     await wallet.install({ as: 6 });
-    await page.goto("/?tab=mine");
+    await page.goto("/polls?tab=mine");
     await expect(page.getByTestId("empty-state")).toContainText("Connect a wallet");
     await wallet.connect();
     await expect(page.locator(`[data-poll-id="${mine}"]`)).toBeVisible();

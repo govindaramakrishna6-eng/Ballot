@@ -1,6 +1,7 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { NavLink, Outlet } from "react-router";
 import { ErrorBoundary } from "./ErrorBoundary";
+import { Footer } from "./Footer";
 import { NetworkBanner } from "./NetworkBanner";
 import { NoWalletHint } from "./NoWalletHint";
 
@@ -8,7 +9,7 @@ const nav = ({ isActive }: { isActive: boolean }) => `nav-link ${isActive ? "nav
 
 export function Layout() {
   return (
-    <div className="min-h-dvh">
+    <div className="flex min-h-dvh flex-col">
       <a href="#main" className="skip-link">
         Skip to content
       </a>
@@ -18,7 +19,7 @@ export function Layout() {
             Ballot
           </NavLink>
           <nav aria-label="Main" className="flex items-center gap-1">
-            <NavLink to="/" className={nav} end>
+            <NavLink to="/polls" className={nav}>
               Polls
             </NavLink>
             <NavLink to="/create" className={nav}>
@@ -35,11 +36,12 @@ export function Layout() {
         <NetworkBanner />
         <NoWalletHint />
       </div>
-      <main id="main" className="wrap py-6">
+      <main id="main" className="wrap w-full flex-1 py-6">
         <ErrorBoundary>
           <Outlet />
         </ErrorBoundary>
       </main>
+      <Footer />
     </div>
   );
 }

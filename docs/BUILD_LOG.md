@@ -31,3 +31,30 @@ Assumptions I made: env var names SEPOLIA_RPC_URL, DEPLOYER_PRIVATE_KEY, ETHERSC
 What the next phase needs from this one: empty contracts/ and test/ dirs; npm test wired.
 Commit made: chore: scaffold Hardhat 3 contracts and Vite React frontend
 ```
+
+---
+
+## Phase 1 — Contract and tests
+
+### Decisions
+- **getPollsPage(0, n) treats startId 0 as 1; limit 0 returns empty** — ids start at 1; a caller asking "from the beginning" with 0 should not get an empty page.
+- **getVotedOption does not revert for unknown poll ids (returns 0)** — lets the frontend batch it over any id list without one bad id failing the whole multicall.
+- **getPoll reverts PollNotFound for unknown ids** — the frontend maps that to its "not found" state.
+- **cancelPoll check order: exists → NotCreator → PollIsCancelled → PollEnded → PollHasVotes** — cheapest/most-specific first; cancelling twice gives a clear error.
+- **Duration bounds are inclusive** (exactly 5 min and exactly 30 days are OK), matching the section 5 boundary tests.
+- **Exact per-case gas printed from the gas test** — `--gas-stats` only shows aggregates across all calls.
+
+### Gas (default profile, no optimizer; production profile in brackets)
+createPoll 2 options: 239,716 [237,190] · createPoll 10 options: 450,852 [443,506] · vote: 102,200 [101,244] · deploy: 2,030,711 · bytecode 9,176 bytes
+
+```
+STATUS REPORT
+Done: VotingDApp.sol per section 4 (NatSpec on every public item, WHY comments); 45 tests covering every section 5 item; gas report.
+Files created/changed (paths): contracts/contracts/VotingDApp.sol, contracts/test/VotingDApp.ts
+How to run or verify: cd contracts && npx hardhat test --gas-stats
+Test/build results (actually observed): 45 passing (45 nodejs), 0 failing. Gas table + exact per-case gas printed (see above).
+Not done / known issues: none.
+Assumptions I made: see Decisions above.
+What the next phase needs from this one: artifacts/contracts/VotingDApp.sol/VotingDApp.json (ABI) after compile.
+Commit made: feat(contracts): VotingDApp with full test suite and gas report
+```

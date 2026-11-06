@@ -294,3 +294,32 @@ Commit made: docs: beginner README, Vercel config, engines and final audit
 - Deployed with a Vercel token saved by the user through the environment's secure credential form (value never seen).
 - Production URL: https://ballot-omega.vercel.app (project `ballot`, remote build on Vercel, framework Vite).
 - **Open item for the owner:** Vercel's default "Deployment Protection" (Vercel Authentication, `all_except_custom_domains`) is on, so visitors to the `*.vercel.app` URL see a Vercel login wall. Turning it off is the owner's decision: Vercel dashboard → project `ballot` → Settings → Deployment Protection → Vercel Authentication → off. Vercel also defaulted the build to Node 26.x; tests ran on Node 22 (Settings → Build → Node.js Version → 22.x to match).
+
+---
+
+## Front page redesign ("wow factor", user request)
+
+### Decisions
+- **Front page set as a civic gazette, not a crypto landing page** — stays inside section 7 (no gradients, glows, blobs, hype copy). The wow comes from *real chain data* presented beautifully: the product idea (provable votes) becomes the hero.
+- **Masthead with a live dateline** ("<chain> edition · ● Block N · date/time"), driven by the chain clock, which now also exposes the latest block number.
+- **Headline "Every vote leaves a receipt."** in Fraunces at optical size 144 with a true soft/"wonky" italic — switched to `@fontsource-variable/fraunces/full.css` + `full-italic.css`; the previous default import was weight-only, so `opsz` and italics had silently been faked. Cost: ~270 KB of fonts instead of 37 KB.
+- **Hero illustration = the newest real vote on-chain**, printed as a tilted receipt that drops in and gets stamped (marked "Specimen" before any vote exists).
+- **Front-page figures** (polls / open now / votes) in large serif numerals with a 700ms count-up.
+- **Featured poll** = the most-voted open poll with live ink bars.
+- **"On the record" column**: live feed of Voted/PollCreated/PollCancelled logs; rows arriving while you watch get a brief ink-wash highlight. Window = last 20,000 blocks (≈2.8 days) because publicnode prunes older logs ("pruned history unavailable" at 50k — tested live); new events keep it current.
+- **Subtle SVG paper grain** on the page background.
+- **All new motion respects prefers-reduced-motion** (count-up jumps, no drop/stamp/wash/pulse).
+- **Layout widened to 72rem with a two-column newspaper grid**; poll, create and My votes pages stay narrow and centred.
+
+```
+STATUS REPORT
+Done: new front page (masthead + live dateline, headline, live hero receipt, tally, featured poll, live activity column, grain).
+Files created/changed (paths): frontend/src/components/home/*, hooks/useActivity.ts, hooks/useCountUp.ts, lib/relativeTime.ts,
+  hooks/useChainClock.tsx, hooks/useLiveUpdates.tsx, lib/queryKeys.ts, pages/PollList.tsx, index.css, main.tsx,
+  pages/{PollDetail,CreatePoll,MyVotes}.tsx, e2e/screenshots.spec.ts, e2e/fixtures.ts, docs/screenshots/*
+How to run or verify: npm run dev; npm run screenshots
+Test/build results (actually observed): tsc OK; oxlint 0 issues (excluding the 3 known fast-refresh notes); vitest 21 passed;
+  build OK; E2E 22 passed (35.3s); mobile 390px scrollWidth = 390 (no sideways scroll).
+Not done / known issues: activity feed only reaches ~2.8 days back on the free public RPC.
+Commit made: feat(frontend): gazette-style front page with live on-chain receipt and activity
+```

@@ -58,7 +58,7 @@ export function MyVotes() {
   }
 
   return (
-    <section aria-labelledby="me-heading">
+    <section aria-labelledby="me-heading" className="mx-auto max-w-3xl">
       <h1 id="me-heading" className="display text-3xl">
         My votes
       </h1>

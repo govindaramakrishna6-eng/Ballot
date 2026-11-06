@@ -27,6 +27,7 @@ export function LiveUpdatesProvider({ children }: { children: ReactNode }) {
   function refetchPoll(pollId: bigint | undefined) {
     // invalidateQueries only refetches queries that are on screen, i.e. "visible polls".
     void queryClient.invalidateQueries({ queryKey: pollKeys.list() });
+    void queryClient.invalidateQueries({ queryKey: pollKeys.activity() });
     if (pollId !== undefined) void queryClient.invalidateQueries({ queryKey: pollKeys.poll(pollId) });
   }
 

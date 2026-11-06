@@ -61,8 +61,8 @@ type WalletControls = {
 };
 
 export const test = base.extend<{ wallet: WalletControls }>({
-  wallet: async ({ page }, use) => {
-    await use({
+  wallet: async ({ page }, provide) => {
+    await provide({
       install: async ({ as = 1, chainId = 31337 } = {}) => {
         await page.addInitScript(installFakeWallet, { rpcUrl: RPC, account: ACCOUNTS[as], chainId });
       },

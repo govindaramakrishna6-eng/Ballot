@@ -3,8 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { usePublicClient } from "wagmi";
 import { isLocalChain, targetChain } from "../config/chains";
 
-type Clock = { nowSec: number; synced: boolean };
-const ClockContext = createContext<Clock>({ nowSec: Math.floor(Date.now() / 1000), synced: false });
+type Clock = { nowSec: number; synced: boolean; blockNumber: bigint | null };
+const ClockContext = createContext<Clock>({ nowSec: Math.floor(Date.now() / 1000), synced: false, blockNumber: null });
 
 /**
  * Poll status must follow CHAIN time, not the user's clock (which may be wrong).
@@ -42,7 +42,7 @@ export function ChainClockProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <ClockContext.Provider value={{ nowSec: Math.floor(nowMs / 1000), synced }}>
+    <ClockContext.Provider value={{ nowSec: Math.floor(nowMs / 1000), synced, blockNumber: block?.number ?? null }}>
       {children}
     </ClockContext.Provider>
   );

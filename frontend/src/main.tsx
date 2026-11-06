@@ -1,4 +1,6 @@
-import "@fontsource-variable/fraunces";
+// Full axis set (weight, optical size, softness, "wonk") plus true italics for the headline.
+import "@fontsource-variable/fraunces/full.css";
+import "@fontsource-variable/fraunces/full-italic.css";
 import "@fontsource/ibm-plex-sans/400.css";
 import "@fontsource/ibm-plex-sans/600.css";
 import "@fontsource/ibm-plex-mono/400.css";

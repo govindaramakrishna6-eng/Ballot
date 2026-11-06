@@ -99,7 +99,7 @@ export function CreatePoll() {
 
   if (step === "review") {
     return (
-      <section aria-labelledby="review-heading" className="max-w-2xl">
+      <section aria-labelledby="review-heading" className="mx-auto max-w-2xl">
         <h1 id="review-heading" className="display text-3xl">
           Review your poll
         </h1>
@@ -136,7 +136,7 @@ export function CreatePoll() {
   }
 
   return (
-    <section aria-labelledby="create-heading" className="max-w-2xl">
+    <section aria-labelledby="create-heading" className="mx-auto max-w-2xl">
       <h1 id="create-heading" className="display text-3xl">
         Create a poll
       </h1>

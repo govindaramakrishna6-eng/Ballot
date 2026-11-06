@@ -35,7 +35,7 @@ export function PollDetail() {
 
 function DetailSkeleton() {
   return (
-    <div aria-busy="true" aria-label="Loading poll" className="max-w-2xl">
+    <div aria-busy="true" aria-label="Loading poll" className="mx-auto max-w-2xl">
       <Skeleton className="h-9 w-3/4" />
       <Skeleton className="mt-3 h-4 w-1/2" />
       <Skeleton className="mt-8 h-24 w-full" />
@@ -87,7 +87,7 @@ function PollView({ poll }: { poll: Poll }) {
   const canVote = status === "open" && myVote === 0;
 
   return (
-    <article className="max-w-2xl" aria-labelledby="poll-title">
+    <article className="mx-auto max-w-2xl" aria-labelledby="poll-title">
       <div className="flex flex-wrap items-center gap-2">
         <StatusPill status={status} />
         <span className="mono muted text-sm">Poll #{poll.id.toString()}</span>

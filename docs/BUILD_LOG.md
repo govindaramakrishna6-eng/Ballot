@@ -180,3 +180,49 @@ Assumptions I made: see Decisions.
 What the next phase needs from this one: data-testid hooks must survive the restyle; rerun npm run e2e after Phase 5.
 Commit made: test(e2e): Playwright suite with scriptable injected wallet on a local Hardhat node
 ```
+
+---
+
+## Phase 5 — Design ("civic paper")
+
+### What I took from /design-refs
+- **/design-refs is empty** — no screenshots were ever added, so there was nothing to take patterns from. The direction comes from CLAUDE.md section 7 alone.
+
+### Two variations (static poll page, `docs/design/variation-{a,b}.html`, screenshots `variation-{a,b}-{light,dark}.png`)
+- **A — "Registry ink"**: warm paper #f4efe4, ink #1c1b18, ballot-green accent #1d5a3c (dark: #5fae84). Upright Fraunces titles, Plex Sans UI, Plex Mono numbers. Results are thick black ink bars; status labels are boxed mono caps; receipt has punched perforations and a double-ruled rotated "RECORDED" rubber stamp.
+- **B — "Civic notice"**: brighter paper, vermilion accent #b8381a, italic soft Fraunces titles, ruled-notebook page background, vermilion result bars with tick marks, solid-tag stamp.
+
+### Critique and choice — **A chosen**
+- Section 7 asks for "results as thick ink bars" and "one accent used sparingly for stamped moments". A does both literally; **B paints every bar vermilion**, so the accent stops meaning "stamped".
+- B's ruled background bleeds past the content and reads as a school notebook, not a polling station; in dark mode its bars are loud.
+- B's italic display serif is harder to read for long, untrusted poll titles; A's upright serif truncates and wraps cleanly.
+- B's stamp looks like a price sticker; A's double-ruled rotated stamp reads as an official mark.
+- Neither uses anything on the banned list (no gradients, glows, glass, blobs, particles, emoji icons). B's single framed panel was the closest to "card with shadow".
+- Contrast (computed, WCAG): every text pair ≥ 5.6:1 in both themes (ink 15.0/14.0, muted 6.3/6.6, accent 7.1/6.5, danger 6.6/7.1, warning 6.2/8.9). Form-control borders use the muted ink (≥ 5:1) rather than the decorative hairline (1.5:1).
+
+### Applied
+- Tokens + both themes via `prefers-color-scheme`; self-hosted fonts (@fontsource, no Google Fonts request); tabular numerals for counts.
+- Poll list as a ruled ledger (no wall of identical shadowed cards); printed status labels; strike-through "Cancelled".
+- Receipt with perforated edges and a 420ms stamp "thunk" + slide-in when a vote confirms; skeleton pulse and all transitions disabled under `prefers-reduced-motion`.
+- RainbowKit themed to paper/ink: square corners, no blur, no soft shadows, account chip as an inked outline.
+- Visible 3px accent focus ring; skip link; option rows show selection by border + fill, not colour alone.
+
+### Still looks generic (honest list)
+- RainbowKit's modal layout (wallet list, "What is a wallet?") is themed but structurally RainbowKit's.
+- The native `datetime-local` picker looks like the browser's, not like a form.
+- No favicon/brand mark yet (intentionally — no logo was asked for).
+- Mobile header packs brand, nav and account chip in one row; it works at 390px but is tight.
+
+```
+STATUS REPORT
+Done: two variations built + screenshotted light/dark, critiqued, A applied across the app incl. stamp animation,
+  dark mode, reduced motion, AA contrast; final screenshots in docs/screenshots.
+Files created/changed (paths): frontend/src/index.css, frontend/src/main.tsx, components/PollCard.tsx, pages/PollList.tsx,
+  frontend/e2e/screenshots.spec.ts, frontend/package.json, docs/design/*, docs/screenshots/*
+How to run or verify: cd frontend && npm run screenshots (writes docs/screenshots); npm run e2e
+Test/build results (actually observed): tsc + vite build OK; E2E 20 passed (33.8s) after the restyle; screenshots 2 passed.
+Not done / known issues: see "Still looks generic".
+Assumptions I made: system-preference dark mode only (no manual toggle — not requested).
+What the next phase needs from this one: class names (.label, .ledger, .receipt…) for the /me page.
+Commit made: feat(design): apply "civic paper" variation A with dark mode and stamp animation
+```

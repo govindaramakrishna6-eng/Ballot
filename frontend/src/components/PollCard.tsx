@@ -20,7 +20,7 @@ export function PollCard({ poll, myVote }: { poll: Poll; myVote: number | undefi
           : `${status === "closed" ? "Winner" : "Leading"}: ${poll.options[r.leader!]}`;
 
   return (
-    <li className="card" data-testid="poll-card" data-poll-id={poll.id.toString()}>
+    <li className="ledger-row" data-testid="poll-card" data-poll-id={poll.id.toString()}>
       <div className="flex items-start justify-between gap-3">
         <Link to={`/poll/${poll.id}`} className="card-title" title={poll.title}>
           {poll.title}

@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "typecheck": "tsc -b",
-    "e2e": "playwright test --trace off"
+    "e2e": "playwright test --trace off",
+    "screenshots": "SCREENSHOTS=1 playwright test screenshots --trace off"
   },
   "dependencies": {
     "@fontsource-variable/fraunces": "5.3.0",

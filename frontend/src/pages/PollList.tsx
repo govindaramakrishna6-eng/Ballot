@@ -60,9 +60,9 @@ export function PollList() {
 
       <div role="tabpanel" className="mt-4" aria-busy={polls.isPending}>
         {polls.isPending ? (
-          <ul className="grid gap-3" aria-label="Loading polls">
+          <ul className="ledger" aria-label="Loading polls">
             {[0, 1, 2].map((i) => (
-              <li key={i} className="card">
+              <li key={i} className="ledger-row">
                 <Skeleton className="h-5 w-2/3" />
                 <Skeleton className="mt-3 h-4 w-1/3" />
               </li>
@@ -88,7 +88,7 @@ export function PollList() {
             )}
           </EmptyState>
         ) : (
-          <ul className="grid gap-3" data-testid="poll-list">
+          <ul className="ledger" data-testid="poll-list">
             {visible.map((p) => (
               <PollCard key={p.id.toString()} poll={p} myVote={voted.data?.get(p.id.toString())} />
             ))}

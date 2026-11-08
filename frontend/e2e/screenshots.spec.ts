@@ -29,8 +29,10 @@ for (const scheme of ["light", "dark"] as const) {
     await page.goto(`/poll/${id}`);
     await page.getByRole("radio", { name: "Yes, this season" }).check();
     await page.getByRole("button", { name: "Cast vote" }).click();
-    await expect(page.getByTestId("receipt")).toBeVisible();
-    await page.waitForTimeout(600); // let the stamp animation settle
+    await expect(page.getByTestId("tx-sealed")).toBeVisible();
+    await page.waitForTimeout(1800); // seal draw + ring pulse + stamp settle
+    await page.getByTestId("tx-sealed").scrollIntoViewIfNeeded();
+    await page.screenshot({ path: `${OUT}/vote-sealed-${scheme}.png` });
     await page.screenshot({ path: `${OUT}/poll-${scheme}.png`, fullPage: true });
 
     await page.goto("/create");
@@ -38,6 +40,10 @@ for (const scheme of ["light", "dark"] as const) {
     await page.getByPlaceholder("Option 1").fill("By the pond");
     await page.getByPlaceholder("Option 2").fill("by the pond");
     await page.screenshot({ path: `${OUT}/create-${scheme}.png`, fullPage: true });
+    await page.getByPlaceholder("Option 2").fill("Near the gate");
+    await page.getByRole("button", { name: "Review" }).click();
+    await expect(page.getByTestId("fee-estimate")).toContainText("gas");
+    await page.screenshot({ path: `${OUT}/create-review-${scheme}.png`, fullPage: true });
 
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`/poll/${id}`);

@@ -8,13 +8,14 @@ import "@fontsource/ibm-plex-mono/600.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import "./index.css";
 
-import { darkTheme, lightTheme, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { darkTheme, lightTheme, RainbowKitProvider, type AvatarComponent } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import { WagmiProvider } from "wagmi";
 import App from "./App";
+import { Identicon } from "./components/Identicon";
 import { NotDeployed, StartupError } from "./components/StartupScreens";
 import { targetChain } from "./config/chains";
 import { envProblems } from "./config/env";
@@ -53,6 +54,9 @@ const walletTheme = {
   ),
 };
 
+// RainbowKit's default avatar is an emoji; ours is the same identicon used everywhere else in the app.
+const WalletAvatar: AvatarComponent = ({ address, size }) => <Identicon address={address} size={size} />;
+
 const root = createRoot(document.getElementById("root")!);
 
 if (envProblems.length > 0) {
@@ -64,7 +68,7 @@ if (envProblems.length > 0) {
     <StrictMode>
       <WagmiProvider config={wagmiConfig}>
         <QueryClientProvider client={queryClient}>
-          <RainbowKitProvider initialChain={targetChain} theme={walletTheme}>
+          <RainbowKitProvider initialChain={targetChain} theme={walletTheme} avatar={WalletAvatar}>
             <BrowserRouter>
               <AnnouncerProvider>
                 <ChainClockProvider>

@@ -2,6 +2,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { NavLink, Outlet } from "react-router";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { Footer } from "./Footer";
+import { Toaster } from "./Toaster";
 import { NetworkBanner } from "./NetworkBanner";
 import { NoWalletHint } from "./NoWalletHint";
 
@@ -42,6 +43,7 @@ export function Layout() {
         </ErrorBoundary>
       </main>
       <Footer />
+      <Toaster />
     </div>
   );
 }

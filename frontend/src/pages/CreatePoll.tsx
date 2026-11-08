@@ -1,10 +1,14 @@
 import { useId, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { parseEventLogs } from "viem";
+import { OnChainSteps, PollPreview } from "../components/PollPreview";
 import { TxStatus } from "../components/TxStatus";
 import { votingAbi } from "../contract/contract";
+import { useAccount } from "wagmi";
 import { useChainClock } from "../hooks/useChainClock";
+import { useCreateFeeEstimate } from "../hooks/useFeeEstimate";
 import { useTx } from "../hooks/useTx";
+import { useReducedMotion } from "../hooks/useReducedMotion";
 import { useWriteGate } from "../hooks/useWriteGate";
 import { byteLength } from "../lib/bytes";
 import { formatDateTime } from "../lib/format";
@@ -51,8 +55,10 @@ export function CreatePoll() {
   const navigate = useNavigate();
   const { nowSec } = useChainClock();
   const gate = useWriteGate();
+  const { address } = useAccount();
   const uid = useId();
   const nextKey = useRef(2);
+  const reduceMotion = useReducedMotion();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -70,6 +76,12 @@ export function CreatePoll() {
     nowSec,
   );
   const show = (msg: string | undefined) => (attempted ? msg : undefined);
+  const endSec = fromLocalInput(deadline);
+  const fee = useCreateFeeEstimate(
+    step === "review" && check.valid && endSec !== null
+      ? [check.clean.title, check.clean.description, check.clean.options, BigInt(endSec)]
+      : null,
+  );
 
   const tx = useTx({
     action: "create",
@@ -79,7 +91,10 @@ export function CreatePoll() {
     onConfirmed: (receipt) => {
       // The new id comes from the PollCreated event, never from a guess like pollCount + 1.
       const [created] = parseEventLogs({ abi: votingAbi, logs: receipt.logs, eventName: "PollCreated" });
-      if (created) navigate(`/poll/${created.args.pollId}`);
+      if (!created) return;
+      // Let the "recorded" seal play for a moment, then land on the live poll with its block + tx.
+      const state = { created: { block: receipt.blockNumber.toString(), hash: receipt.transactionHash } };
+      setTimeout(() => navigate(`/poll/${created.args.pollId}`, { state }), reduceMotion ? 300 : 1400);
     },
   });
 
@@ -115,6 +130,20 @@ export function CreatePoll() {
           </ol>
           <p className="mt-3 text-sm">Voting closes {formatDateTime(fromLocalInput(deadline)!)}</p>
         </div>
+        <p className="fee-line mt-4" data-testid="fee-estimate">
+          <span className="muted">Network fee</span>{" "}
+          {!address ? (
+            <span>shown once your wallet is connected</span>
+          ) : fee.isPending ? (
+            <span className="muted">estimating…</span>
+          ) : fee.data ? (
+            <span className="mono">
+              ≈ {Number(fee.data.eth).toPrecision(3)} ETH <span className="muted">({fee.data.gas.toLocaleString()} gas · test ETH, free)</span>
+            </span>
+          ) : (
+            <span className="muted">couldn't estimate right now</span>
+          )}
+        </p>
         <p className="notice mt-4" role="note">
           <strong>This is permanent and can't be edited.</strong> Once created, the poll lives on the blockchain. You can cancel it
           only while it has no votes.
@@ -136,139 +165,152 @@ export function CreatePoll() {
   }
 
   return (
-    <section aria-labelledby="create-heading" className="mx-auto max-w-2xl">
-      <h1 id="create-heading" className="display text-3xl">
-        Create a poll
-      </h1>
-      <p className="muted mt-1 text-sm">Limits are in bytes, like the contract: some letters (Tamil, emoji…) use 3–4 bytes each.</p>
+    <div className="create-layout">
+      <section aria-labelledby="create-heading" className="min-w-0">
+        <h1 id="create-heading" className="display text-3xl">
+          Create a poll
+        </h1>
+        <p className="muted mt-1 text-sm">Limits are in bytes, like the contract: some letters (Tamil, emoji…) use 3–4 bytes each.</p>
 
-      <form onSubmit={goReview} noValidate className="mt-5 space-y-5">
-        <div className="field">
-          <div className="field-head">
-            <label htmlFor={`${uid}-title`}>Question</label>
-            <Counter used={byteLength(title.trim())} max={MAX_TITLE_BYTES} />
-          </div>
-          <input
-            id={`${uid}-title`}
-            className="input"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            aria-invalid={Boolean(show(check.errors.title))}
-            aria-describedby={`${uid}-title-err`}
-          />
-          <p id={`${uid}-title-err`} className="field-error">
-            {show(check.errors.title)}
-          </p>
-        </div>
-
-        <div className="field">
-          <div className="field-head">
-            <label htmlFor={`${uid}-desc`}>Description (optional)</label>
-            <Counter used={byteLength(description.trim())} max={MAX_DESCRIPTION_BYTES} />
-          </div>
-          <textarea
-            id={`${uid}-desc`}
-            className="input min-h-24"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            aria-invalid={Boolean(check.errors.description)}
-            aria-describedby={`${uid}-desc-err`}
-          />
-          <p id={`${uid}-desc-err`} className="field-error">
-            {check.errors.description}
-          </p>
-        </div>
-
-        <fieldset className="field">
-          <legend>
-            Options ({MIN_OPTIONS}–{MAX_OPTIONS})
-          </legend>
-          <ol className="space-y-2">
-            {rows.map((row, i) => {
-              const err = show(check.errors.options[i]) ?? (byteLength(row.value.trim()) > MAX_OPTION_BYTES ? check.errors.options[i] : undefined);
-              const warn = check.warnings[i];
-              return (
-                <li key={row.key}>
-                  <div className="flex items-center gap-2">
-                    <label htmlFor={`${uid}-opt-${row.key}`} className="sr-only">
-                      Option {i + 1}
-                    </label>
-                    <input
-                      id={`${uid}-opt-${row.key}`}
-                      className="input flex-1"
-                      placeholder={`Option ${i + 1}`}
-                      value={row.value}
-                      onChange={(e) => setRows(rows.map((r) => (r.key === row.key ? { ...r, value: e.target.value } : r)))}
-                      aria-invalid={Boolean(err)}
-                      aria-describedby={`${uid}-opt-${row.key}-msg`}
-                    />
-                    <Counter used={byteLength(row.value.trim())} max={MAX_OPTION_BYTES} />
-                    <button
-                      type="button"
-                      className="btn btn-ghost"
-                      onClick={() => setRows(rows.filter((r) => r.key !== row.key))}
-                      disabled={rows.length <= MIN_OPTIONS}
-                      aria-label={`Remove option ${i + 1}`}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                  <p id={`${uid}-opt-${row.key}-msg`} className={err ? "field-error" : "field-warning"} data-testid={`option-msg-${i}`}>
-                    {err ?? warn}
-                  </p>
-                </li>
-              );
-            })}
-          </ol>
-          <button
-            type="button"
-            className="btn btn-secondary mt-2"
-            onClick={() => setRows([...rows, { key: nextKey.current++, value: "" }])}
-            disabled={rows.length >= MAX_OPTIONS}
-          >
-            Add option
-          </button>
-          {rows.length >= MAX_OPTIONS && <p className="hint mt-1">That's the maximum of {MAX_OPTIONS} options.</p>}
-        </fieldset>
-
-        <div className="field">
-          <label htmlFor={`${uid}-deadline`}>Voting closes</label>
-          <div className="flex flex-wrap items-center gap-2">
+        <form onSubmit={goReview} noValidate className="mt-5 space-y-5">
+          <div className="field">
+            <div className="field-head">
+              <label htmlFor={`${uid}-title`}>Question</label>
+              <Counter used={byteLength(title.trim())} max={MAX_TITLE_BYTES} />
+            </div>
             <input
-              id={`${uid}-deadline`}
-              type="datetime-local"
+              id={`${uid}-title`}
               className="input"
-              value={deadline}
-              min={minInput}
-              max={maxInput}
-              onChange={(e) => setDeadline(e.target.value)}
-              aria-invalid={Boolean(show(check.errors.endTime))}
-              aria-describedby={`${uid}-deadline-err`}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              aria-invalid={Boolean(show(check.errors.title))}
+              aria-describedby={`${uid}-title-err`}
             />
-            {PRESETS.map((p) => (
-              <button key={p.label} type="button" className="btn btn-ghost" onClick={() => setDeadline(toLocalInput(nowSec + p.sec))}>
-                {p.label}
-              </button>
-            ))}
+            <p id={`${uid}-title-err`} className="field-error">
+              {show(check.errors.title)}
+            </p>
           </div>
-          <p className="hint mt-1">
-            {fromLocalInput(deadline) !== null && `Closes ${formatDateTime(fromLocalInput(deadline)!)}. `}
-            Between 6 minutes and 30 days from now.
-          </p>
-          <p id={`${uid}-deadline-err`} className="field-error">
-            {show(check.errors.endTime)}
-          </p>
-        </div>
 
-        <button type="submit" className="btn btn-primary">
-          Review
-        </button>
-        {attempted && !check.valid && (
-          <p role="alert" className="field-error">
-            Fix the highlighted fields to continue.
-          </p>
-        )}
-      </form>
-    </section>
+          <div className="field">
+            <div className="field-head">
+              <label htmlFor={`${uid}-desc`}>Description (optional)</label>
+              <Counter used={byteLength(description.trim())} max={MAX_DESCRIPTION_BYTES} />
+            </div>
+            <textarea
+              id={`${uid}-desc`}
+              className="input min-h-24"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              aria-invalid={Boolean(check.errors.description)}
+              aria-describedby={`${uid}-desc-err`}
+            />
+            <p id={`${uid}-desc-err`} className="field-error">
+              {check.errors.description}
+            </p>
+          </div>
+
+          <fieldset className="field">
+            <legend>
+              Options ({MIN_OPTIONS}–{MAX_OPTIONS})
+            </legend>
+            <ol className="space-y-2">
+              {rows.map((row, i) => {
+                const err = show(check.errors.options[i]) ?? (byteLength(row.value.trim()) > MAX_OPTION_BYTES ? check.errors.options[i] : undefined);
+                const warn = check.warnings[i];
+                return (
+                  <li key={row.key}>
+                    <div className="flex items-center gap-2">
+                      <label htmlFor={`${uid}-opt-${row.key}`} className="sr-only">
+                        Option {i + 1}
+                      </label>
+                      <input
+                        id={`${uid}-opt-${row.key}`}
+                        className="input flex-1"
+                        placeholder={`Option ${i + 1}`}
+                        value={row.value}
+                        onChange={(e) => setRows(rows.map((r) => (r.key === row.key ? { ...r, value: e.target.value } : r)))}
+                        aria-invalid={Boolean(err)}
+                        aria-describedby={`${uid}-opt-${row.key}-msg`}
+                      />
+                      <Counter used={byteLength(row.value.trim())} max={MAX_OPTION_BYTES} />
+                      <button
+                        type="button"
+                        className="btn btn-ghost"
+                        onClick={() => setRows(rows.filter((r) => r.key !== row.key))}
+                        disabled={rows.length <= MIN_OPTIONS}
+                        aria-label={`Remove option ${i + 1}`}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    <p id={`${uid}-opt-${row.key}-msg`} className={err ? "field-error" : "field-warning"} data-testid={`option-msg-${i}`}>
+                      {err ?? warn}
+                    </p>
+                  </li>
+                );
+              })}
+            </ol>
+            <button
+              type="button"
+              className="btn btn-secondary mt-2"
+              onClick={() => setRows([...rows, { key: nextKey.current++, value: "" }])}
+              disabled={rows.length >= MAX_OPTIONS}
+            >
+              Add option
+            </button>
+            {rows.length >= MAX_OPTIONS && <p className="hint mt-1">That's the maximum of {MAX_OPTIONS} options.</p>}
+          </fieldset>
+
+          <div className="field">
+            <label htmlFor={`${uid}-deadline`}>Voting closes</label>
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                id={`${uid}-deadline`}
+                type="datetime-local"
+                className="input"
+                value={deadline}
+                min={minInput}
+                max={maxInput}
+                onChange={(e) => setDeadline(e.target.value)}
+                aria-invalid={Boolean(show(check.errors.endTime))}
+                aria-describedby={`${uid}-deadline-err`}
+              />
+              {PRESETS.map((p) => (
+                <button key={p.label} type="button" className="btn btn-ghost" onClick={() => setDeadline(toLocalInput(nowSec + p.sec))}>
+                  {p.label}
+                </button>
+              ))}
+            </div>
+            <p className="hint mt-1">
+              {fromLocalInput(deadline) !== null && `Closes ${formatDateTime(fromLocalInput(deadline)!)}. `}
+              Between 6 minutes and 30 days from now.
+            </p>
+            <p id={`${uid}-deadline-err`} className="field-error">
+              {show(check.errors.endTime)}
+            </p>
+          </div>
+
+          <button type="submit" className="btn btn-primary">
+            Review
+          </button>
+          {attempted && !check.valid && (
+            <p role="alert" className="field-error">
+              Fix the highlighted fields to continue.
+            </p>
+          )}
+        </form>
+      </section>
+      <aside className="create-aside" aria-label="Preview">
+        <p className="aside-kicker mono">Live preview</p>
+        <PollPreview
+          title={title}
+          options={rows.map((r) => r.value)}
+          creator={address}
+          secondsLeft={endSec === null ? null : endSec - nowSec}
+        />
+        <p className="aside-kicker mono mt-8">What happens on-chain</p>
+        <OnChainSteps />
+      </aside>
+    </div>
   );
 }

@@ -3,6 +3,8 @@ import { explorerTxUrl, targetChain } from "../../config/chains";
 import type { Poll } from "../../contract/contract";
 import type { ChainEvents } from "../../hooks/useActivity";
 import { formatDateTime, shortAddress, shortHash } from "../../lib/format";
+import { HashText } from "../HashText";
+import { Identicon } from "../Identicon";
 
 /**
  * The newest real vote on-chain, printed as a stamped paper receipt. The poll title opens the poll;
@@ -51,7 +53,8 @@ export function LatestReceipt({ chain, polls }: { chain: ChainEvents | undefined
           {vote.optionIndex !== null ? poll.options[vote.optionIndex] : "—"}
         </dd>
         <dt>Voter</dt>
-        <dd className="mono" title={vote.actor ?? undefined}>
+        <dd className="mono flex items-center gap-1.5" title={vote.actor ?? undefined}>
+          {vote.actor && <Identicon address={vote.actor} size={16} />}
           {vote.actor ? shortAddress(vote.actor) : "—"}
         </dd>
         <dt>Block</dt>
@@ -63,8 +66,8 @@ export function LatestReceipt({ chain, polls }: { chain: ChainEvents | undefined
           </>
         )}
         <dt>Tx hash</dt>
-        <dd className="mono" title={vote.txHash}>
-          {shortHash(vote.txHash)}
+        <dd>
+          <HashText value={shortHash(vote.txHash)} full={vote.txHash} />
         </dd>
       </dl>
       <figcaption className="receipt-foot">

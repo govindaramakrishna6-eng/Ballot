@@ -1,6 +1,7 @@
 import { explorerTxUrl, targetChain } from "../config/chains";
 import { formatDateTime } from "../lib/format";
 import { CopyButton } from "./CopyButton";
+import { HashText } from "./HashText";
 
 export type ReceiptData = {
   pollId: bigint;
@@ -46,7 +47,7 @@ export function Receipt({ data, fresh = false }: { data: ReceiptData; fresh?: bo
         <dd>{formatDateTime(data.timestamp)}</dd>
         <dt>Tx hash</dt>
         <dd className="mono break-all" data-testid="receipt-hash">
-          {data.txHash} <CopyButton value={data.txHash} label="transaction hash" />
+          <HashText value={data.txHash} /> <CopyButton value={data.txHash} label="transaction hash" />
         </dd>
       </dl>
       <p className="receipt-foot">

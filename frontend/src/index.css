@@ -321,3 +321,134 @@ input[type="datetime-local"].input { width: auto; }
 @media (prefers-reduced-motion: no-preference) {
   .hero-receipt .stamp { animation: stamp-in 420ms cubic-bezier(.2, 1.4, .4, 1) 300ms both; }
 }
+
+/* =====================================================================
+   On-chain experience: identicons, block ribbon, tx journey + seal,
+   live results, proof panel, create preview, toasts
+   ===================================================================== */
+.identicon { display: inline-block; flex: none; border-radius: 3px; vertical-align: middle; }
+
+/* Hero trust chips */
+.trust-chips { margin: 1.4rem auto 0; display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; max-width: 44rem; }
+.trust-chip {
+  display: inline-flex; align-items: center; gap: .35rem;
+  font: 500 .8rem/1 var(--sans); padding: .45rem .7rem;
+  border: 1px solid var(--line); background: color-mix(in srgb, var(--paper-2) 70%, transparent); border-radius: 999px;
+}
+.trust-chip svg { width: .85rem; height: .85rem; fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Live block ribbon */
+.ribbon { margin: 2.5rem auto 0; display: flex; align-items: center; justify-content: center; gap: .9rem; flex-wrap: wrap; }
+.ribbon-label { display: inline-flex; align-items: center; gap: .45rem; font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.ribbon-blocks { display: flex; gap: .4rem; align-items: stretch; }
+.tile > a, .tile > span {
+  display: flex; flex-direction: column; justify-content: center; align-items: center; gap: .15rem;
+  width: 3.4rem; height: 2.6rem; border: 1.5px solid var(--line); background: var(--paper);
+  font: 500 .66rem/1 var(--mono); color: var(--muted); transition: border-color .15s ease, transform .15s ease;
+}
+.tile > a:hover { border-color: var(--ink); color: var(--ink); transform: translateY(-2px); }
+.tile:last-child:not(.tile-ballot) > a, .tile:last-child:not(.tile-ballot) > span { border-color: var(--ink); color: var(--ink); }
+/* The newest block gets an accent underline so "latest" reads at a glance, ballot block or not. */
+.tile:last-child > a, .tile:last-child > span { box-shadow: 0 3px 0 -1px var(--accent); }
+.tile-ballot > a, .tile-ballot > span { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.tile-mark { font-size: .5rem; letter-spacing: .14em; text-transform: uppercase; color: color-mix(in srgb, var(--paper) 75%, var(--accent)); }
+@media (max-width: 639px) { .tile:nth-last-child(n + 6) { display: none; } }
+@media (prefers-reduced-motion: no-preference) {
+  .tile { animation: tile-in 520ms cubic-bezier(.2, .8, .2, 1) both; }
+}
+@keyframes tile-in { from { opacity: 0; transform: translateX(14px) scale(.9); } to { opacity: 1; transform: none; } }
+
+/* Transaction journey: Checked → Signed → Broadcast → Recorded */
+.journey { border: 1.5px solid var(--line); background: var(--paper); padding: 1rem 1.1rem; }
+.journey-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: .9rem; }
+.jstep { position: relative; display: flex; flex-direction: column; align-items: center; gap: .4rem; text-align: center; }
+.jnode {
+  position: relative; z-index: 1; width: 2rem; height: 2rem; border-radius: 50%;
+  display: grid; place-items: center; background: var(--paper); border: 2px solid var(--line); color: var(--muted);
+  font: 600 .75rem/1 var(--mono); transition: background .25s ease, border-color .25s ease;
+}
+.jlabel { font: 600 .66rem/1.2 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.jline { position: absolute; top: 1rem; left: calc(50% + 1.1rem); right: calc(-50% + 1.1rem); height: 2px; background: var(--line); overflow: hidden; }
+.jline-done { background: var(--ink); }
+.jstep-done .jnode { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.jstep-done .jlabel, .jstep-active .jlabel { color: var(--ink); }
+.jstep-active .jnode { border-color: var(--ink); color: var(--ink); }
+.jstep-stopped .jnode { border-color: var(--danger); color: var(--danger); }
+.jcheck, .jstop { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+@media (prefers-reduced-motion: no-preference) {
+  .jcheck path { stroke-dasharray: 16; stroke-dashoffset: 16; animation: draw 320ms ease-out forwards; }
+  .jstep-active .jnode::after {
+    content: ""; position: absolute; inset: -5px; border-radius: 50%;
+    border: 2px solid transparent; border-top-color: var(--accent); animation: spin .9s linear infinite;
+  }
+  /* A "packet" travelling between Broadcast and Recorded while the network picks up the tx. */
+  .jpacket { position: absolute; top: -2px; left: 0; width: 18px; height: 6px; border-radius: 3px; background: var(--accent); animation: packet 1.1s ease-in-out infinite; }
+}
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes packet { from { transform: translateX(-20px); } to { transform: translateX(calc(100% + 140px)); } }
+
+/* The seal: drawn ring + tick, two rings pulse out once */
+.seal-wrap { display: flex; align-items: center; gap: 1rem; padding: .25rem 0 .5rem; }
+.seal { position: relative; width: 3.25rem; height: 3.25rem; flex: none; color: var(--accent); }
+.seal-svg { position: relative; z-index: 1; width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.seal-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid currentColor; opacity: 0; }
+.seal-title { font-family: var(--serif); font-weight: 650; font-size: 1.25rem; }
+@media (prefers-reduced-motion: no-preference) {
+  .seal-circle { stroke-dasharray: 145; stroke-dashoffset: 145; animation: draw 600ms cubic-bezier(.65, 0, .35, 1) forwards; }
+  .seal-tick { stroke-dasharray: 40; stroke-dashoffset: 40; animation: draw 360ms ease-out 520ms forwards; }
+  .seal-ring { animation: ring 900ms ease-out 700ms forwards; }
+  .seal-ring-2 { animation-delay: 880ms; }
+  .seal-wrap > div:last-child { animation: rise 400ms ease-out 600ms both; }
+}
+@keyframes ring { 0% { opacity: .55; transform: scale(1); } 100% { opacity: 0; transform: scale(2.1); } }
+
+/* Live results */
+@media (prefers-reduced-motion: no-preference) {
+  .bar-fill { transform-origin: left; animation: bar-grow 900ms cubic-bezier(.2, .8, .2, 1) both; }
+}
+@keyframes bar-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.bump {
+  position: absolute; right: 100%; top: -.1rem; margin-right: .4rem;
+  font: 700 .75rem/1 var(--mono); color: var(--accent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .bump { animation: bump 1.6s ease-out forwards; }
+}
+@media (prefers-reduced-motion: reduce) { .bump { display: none; } }
+@keyframes bump { 0% { opacity: 0; transform: translateY(6px); } 15% { opacity: 1; transform: none; } 70% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
+
+.voter-stack { display: flex; align-items: center; gap: .75rem; margin-top: .75rem; flex-wrap: wrap; }
+.voter-faces { display: flex; align-items: center; }
+.voter-face { display: inline-flex; border: 2px solid var(--paper); border-radius: 5px; margin-left: -7px; background: var(--paper); }
+.voter-face:first-child { margin-left: 0; }
+.voter-more { margin-left: .4rem; font-size: .75rem; color: var(--muted); }
+
+/* Proof panel */
+.proof { border-top: 2px solid var(--ink); padding-top: 1rem; }
+.proof-grid { margin-top: 1rem; display: grid; gap: 1rem 1.5rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); }
+.proof-item { display: flex; gap: .7rem; align-items: flex-start; }
+.proof-icon { width: 1.3rem; height: 1.3rem; flex: none; margin-top: .1rem; fill: none; stroke: var(--accent); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
+.proof-contract { margin-top: 1.25rem; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; font-size: .85rem; padding: .75rem .9rem; background: var(--paper-2); }
+
+.live-notice { margin-top: 1rem; display: flex; align-items: center; gap: .75rem; padding: .8rem 1rem; border: 1.5px solid var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--paper)); }
+@media (prefers-reduced-motion: no-preference) { .live-notice { animation: rise 500ms ease-out both; } }
+
+/* Create page */
+.create-layout { display: grid; gap: 2.5rem; max-width: 68rem; margin: 0 auto; }
+@media (min-width: 960px) { .create-layout { grid-template-columns: minmax(0, 1fr) 21rem; gap: 3.5rem; } .create-aside { position: sticky; top: 1.5rem; align-self: start; } }
+.aside-kicker { font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: .6rem; }
+.preview-card { transform: rotate(.6deg); }
+.preview-option { display: flex; justify-content: space-between; gap: .75rem; padding: .35rem .55rem; border: 1px solid var(--line); }
+.chain-steps { display: grid; gap: .85rem; }
+.chain-step { display: flex; gap: .7rem; }
+.chain-step-n { width: 1.5rem; height: 1.5rem; flex: none; display: grid; place-items: center; border: 1.5px solid var(--ink); border-radius: 50%; font-size: .7rem; }
+.fee-line { font-size: .9rem; padding: .6rem .8rem; border: 1px dashed var(--line); }
+
+/* Toasts (non-interactive) */
+.toaster { position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%); z-index: 60; display: grid; gap: .5rem; pointer-events: none; width: min(22rem, calc(100vw - 2rem)); }
+.toast { display: flex; align-items: center; gap: .75rem; padding: .75rem .9rem; background: var(--ink); color: var(--paper); box-shadow: 0 14px 30px -18px rgb(0 0 0 / .6); }
+.toast .muted { color: color-mix(in srgb, var(--paper) 70%, transparent); }
+.toast-dot { width: .6rem; height: .6rem; border-radius: 50%; background: var(--muted); flex: none; }
+@media (prefers-reduced-motion: no-preference) { .toast { animation: toast 3.2s ease both; } }
+@keyframes toast { 0% { opacity: 0; transform: translateY(12px); } 10%, 85% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(6px); } }

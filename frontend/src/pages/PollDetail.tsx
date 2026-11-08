@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { useParams } from "react-router";
+import { useLocation, useParams } from "react-router";
 import { useAccount } from "wagmi";
 import { Address } from "../components/Address";
+import { HashText } from "../components/HashText";
+import { OnChainProof } from "../components/OnChainProof";
 import { Receipt, type ReceiptData } from "../components/Receipt";
 import { Results } from "../components/Results";
 import { ShareButton } from "../components/ShareButton";
@@ -10,11 +12,12 @@ import { ErrorState, NotFound } from "../components/States";
 import { StatusPill } from "../components/StatusPill";
 import { TxStatus } from "../components/TxStatus";
 import type { Poll } from "../contract/contract";
+import { useChainEvents } from "../hooks/useActivity";
 import { useChainClock } from "../hooks/useChainClock";
 import { usePoll, useVotedOptions, useVoteProof } from "../hooks/usePolls";
 import { useTx } from "../hooks/useTx";
 import { useWriteGate } from "../hooks/useWriteGate";
-import { formatCountdown, formatDateTime } from "../lib/format";
+import { formatCountdown, formatDateTime, shortHash } from "../lib/format";
 import { pollStatus } from "../lib/status";
 
 /** Only canonical positive integers are poll ids ("01", "1e3", "-1", "abc" are not). */
@@ -56,6 +59,10 @@ function PollView({ poll }: { poll: Poll }) {
   const [picked, setPicked] = useState<{ account: string | undefined; index: number } | null>(null);
   const choice = picked && picked.account === address ? picked.index : null;
   const setChoice = (index: number) => setPicked({ account: address, index });
+  const chain = useChainEvents();
+  const voters = (chain.data?.events ?? []).filter((e) => e.kind === "vote" && e.pollId === poll.id && e.actor).map((e) => e.actor!);
+  // Set by the create page after confirmation, so the creator lands on a "your poll is live" moment.
+  const created = (useLocation().state as { created?: { block: string; hash: string } } | null)?.created;
   const isCreator = address !== undefined && address.toLowerCase() === poll.creator.toLowerCase();
 
   const voteTx = useTx({
@@ -96,6 +103,17 @@ function PollView({ poll }: { poll: Poll }) {
         {poll.title}
       </h1>
       {poll.description && <p className="mt-3 whitespace-pre-wrap break-words">{poll.description}</p>}
+      {created && (
+        <div className="live-notice" data-testid="poll-live-notice">
+          <span className="pulse-dot" aria-hidden="true" />
+          <div>
+            <p className="font-semibold">Your poll is live on-chain</p>
+            <p className="mono muted text-xs">
+              Block #{BigInt(created.block).toLocaleString()} · <HashText value={shortHash(created.hash)} full={created.hash} />
+            </p>
+          </div>
+        </div>
+      )}
       <div className="mt-4">
         <ShareButton path={`/poll/${poll.id}`} title={poll.title} />
       </div>
@@ -155,11 +173,13 @@ function PollView({ poll }: { poll: Poll }) {
             </p>
           )}
           {gate.ok && choice === null && <p className="hint mt-2">Choose one option. You can vote once, and it can't be changed.</p>}
-          <div className="mt-3">
-            <TxStatus state={voteTx.state} pendingLabel="Vote sent — waiting for confirmation." />
-          </div>
         </form>
       )}
+
+      {/* Outside the form so the "recorded" seal stays visible after the form gives way to the receipt. */}
+      <div className="mt-4">
+        <TxStatus state={voteTx.state} pendingLabel="Vote sent — waiting for confirmation." />
+      </div>
 
       {myVote > 0 && (
         <p className="notice mt-6" data-testid="already-voted">
@@ -179,7 +199,11 @@ function PollView({ poll }: { poll: Poll }) {
       )}
 
       <div className="mt-8">
-        <Results poll={poll} status={status} myVote={myVote} />
+        <Results poll={poll} status={status} myVote={myVote} voters={voters} />
+      </div>
+
+      <div className="mt-10">
+        <OnChainProof totalVotes={poll.totalVotes} />
       </div>
 
       {isCreator && status === "open" && poll.totalVotes === 0n && (

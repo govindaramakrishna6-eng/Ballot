@@ -373,3 +373,32 @@ Test/build results (actually observed): vitest 26 passed; tsc OK; oxlint 0 new; 
   hero centre 450/450 at 1440×900 and 422.35/422 at 390×844; headline 2 lines on desktop; no sideways scroll at 390px.
 Commit made: feat(frontend): wordmark typeface for the headline; latest-ballot receipt on the homepage
 ```
+
+---
+
+## On-chain experience ("make the D in DApp felt")
+
+### Decisions
+- **Web3 feel from chain-native visuals, not crypto clichés** — the user asked for a Web3 touch and GPay-level delight without confetti. Section 7 still bans neon/glows/gradients/glass/particles, so the "decentralised" feeling comes from things only a blockchain app has: wallets as identicons, blocks you can watch, hashes, a transaction you can follow into a block, and on-chain guarantees.
+- **Identicons** (own 5×5 mirrored generator, muted OKLCH colours from the address) everywhere a wallet appears, and as RainbowKit's avatar (replacing its emoji avatar).
+- **Live block ribbon** in the hero: last 9 blocks slide in as produced; blocks with Ballot events are stamped; each links to Etherscan (Sepolia).
+- **Transaction journey** for every write: Checked → Signed → Broadcast (travelling packet) → Recorded, then a self-drawing seal with a one-time ring pulse and the block number — the "GPay moment". Placed outside the vote form so it stays after the receipt appears. Same test ids as before, so every existing edge-case test still applies.
+- **Hashes "decode" into place** (hex scramble → real value in ~700ms); screen readers and tooltips always get the real value.
+- **Live results**: bars grow in; a vote arriving while you watch shows a "+1" on that option; voter identicon stack; "Verified on-chain" proof panel (immutable, no admin, one wallet one vote, publicly verifiable + contract and verified-source links).
+- **Create**: live preview card, "what happens on-chain" steps, real network-fee estimate on review (`estimateContractGas × gasPrice`, read-only), seal plays ~1.4s then lands on the poll with "Your poll is live on-chain · Block #N".
+- **Wallet toasts** on connect/disconnect — non-interactive (pointer-events: none) so they can never block a click.
+- **All new motion is disabled under prefers-reduced-motion.** No contract, backend or wallet-flow logic changed.
+
+```
+STATUS REPORT
+Done: identicons, block ribbon, tx journey + seal, hash decode, live +1 and voter stack, proof panel, create preview + fee
+  estimate + live notice, trust chips, wallet toasts.
+Files created/changed (paths): frontend/src/components/{Identicon,HashText,Toaster,TxStatus,TxHash,VoterStack,OnChainProof,
+  PollPreview,Results,Address,Receipt,Layout}.tsx, components/home/{BlockRibbon,Hero,OpenPollCard,RecentActivity,
+  LatestReceipt}.tsx, hooks/{useReducedMotion,useFeeEstimate}.ts, lib/identicon.ts, pages/{PollDetail,CreatePoll,Home}.tsx,
+  main.tsx, index.css, e2e/{experience,screenshots}.spec.ts, lib/__tests__/identicon.test.ts, docs/screenshots/*
+How to run or verify: npm run dev; npm run e2e; npm run screenshots
+Test/build results (actually observed): vitest 29 passed; tsc OK; oxlint 0 new; build OK; E2E 34 passed (1.1m).
+Not done / known issues: voter stack shows wallets from the readable log window (~2.8 days on public RPC); the count is always exact.
+Commit made: feat(frontend): on-chain experience — identicons, live block ribbon, tx journey seal, live results, create preview
+```

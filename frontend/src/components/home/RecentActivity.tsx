@@ -6,6 +6,7 @@ import { useChainClock } from "../../hooks/useChainClock";
 import { buildFeed, type FeedItem } from "../../lib/activity";
 import { pluralVotes, shortAddress } from "../../lib/format";
 import { relativeTime } from "../../lib/relativeTime";
+import { Identicon } from "../Identicon";
 import { Skeleton } from "../Skeleton";
 import { LatestReceipt } from "./LatestReceipt";
 
@@ -80,6 +81,7 @@ export function RecentActivity({ chain, polls, loading, failed }: { chain: Chain
                       <Sentence item={item} />
                     </span>
                     <span className="note-meta">
+                      {item.actor && <Identicon address={item.actor} size={14} />}
                       {item.actor && (
                         <span className="mono" title={item.actor}>
                           {shortAddress(item.actor)}

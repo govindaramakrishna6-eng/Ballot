@@ -15,7 +15,7 @@ export function Home() {
 
   return (
     <>
-      <Hero />
+      <Hero chain={chain.data} />
       <OpenPolls
         polls={polls.data}
         loading={polls.isPending}

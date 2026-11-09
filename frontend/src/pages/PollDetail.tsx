@@ -6,7 +6,7 @@ import { HashText } from "../components/HashText";
 import { OnChainProof } from "../components/OnChainProof";
 import { Receipt, type ReceiptData } from "../components/Receipt";
 import { Results } from "../components/Results";
-import { ShareButton } from "../components/ShareButton";
+import { PollActions } from "../components/PollActions";
 import { Skeleton } from "../components/Skeleton";
 import { ErrorState, NotFound } from "../components/States";
 import { StatusPill } from "../components/StatusPill";
@@ -115,7 +115,7 @@ function PollView({ poll }: { poll: Poll }) {
         </div>
       )}
       <div className="mt-4">
-        <ShareButton path={`/poll/${poll.id}`} title={poll.title} />
+        <PollActions poll={poll} />
       </div>
 
       <dl className="meta mt-4 text-sm">

@@ -22,8 +22,8 @@ test.describe("Header navigation", () => {
       const title = (await page.locator(".hero-title").boundingBox())!;
       expect(title.y).toBeGreaterThan(headerBottom.y + headerBottom.height);
       const ribbon = (await page.locator(".ribbon").boundingBox())!;
-      const openPolls = (await page.getByRole("heading", { name: "Open polls" }).boundingBox())!;
-      expect(openPolls.y).toBeGreaterThan(ribbon.y + ribbon.height);
+      const next = (await page.getByRole("heading", { name: "How it works" }).boundingBox())!;
+      expect(next.y).toBeGreaterThan(ribbon.y + ribbon.height);
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(w);
       await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Results" })).toBeVisible();
     });

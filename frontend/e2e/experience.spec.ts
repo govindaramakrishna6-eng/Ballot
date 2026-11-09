@@ -61,9 +61,9 @@ test.describe("On-chain experience", () => {
     expect(id).toBeGreaterThan(0n);
   });
 
-  test("hero shows the four guarantees", async ({ page }) => {
+  test("hero shows the four trust badges", async ({ page }) => {
     await page.goto("/");
-    for (const t of ["Immutable contract", "No admins", "One wallet, one vote", "Publicly verifiable"]) {
+    for (const t of ["Built on a local chain", "Verified contract", "On-chain results", "No admin controls"]) {
       await expect(page.locator(".trust-chip", { hasText: t })).toBeVisible();
     }
   });

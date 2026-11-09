@@ -1,10 +1,17 @@
 import { Link } from "react-router";
+import { isLocalChain, targetChain } from "../../config/chains";
 import type { ChainEvents } from "../../hooks/useActivity";
+import { ChainIcon, EyeIcon, LockIcon, VerifyIcon } from "../icons";
 import { BlockRibbon } from "./BlockRibbon";
 
-const TRUST = ["Immutable contract", "No admins", "One wallet, one vote", "Publicly verifiable"];
+const TRUST = [
+  { icon: <ChainIcon className="icon-xs" />, label: `Built on ${isLocalChain ? "a local chain" : targetChain.name}` },
+  { icon: <VerifyIcon className="icon-xs" />, label: "Verified contract" },
+  { icon: <EyeIcon className="icon-xs" />, label: "On-chain results" },
+  { icon: <LockIcon className="icon-xs" />, label: "No admin controls" },
+];
 
-/** One sentence of what it is, one of what you can do, two ways in — and the live chain beneath. */
+/** Headline, one line of what you can do, the primary + secondary action, then trust badges and the live chain. */
 export function Hero({ chain }: { chain: ChainEvents | undefined }) {
   return (
     <section className="hero" aria-labelledby="hero-title">
@@ -14,24 +21,22 @@ export function Hero({ chain }: { chain: ChainEvents | undefined }) {
           Verifiable, tamper‑proof voting
         </h1>
         <p className="hero-sub">Create polls, vote with your wallet, and see transparent on-chain results.</p>
-        <ul className="trust-chips" aria-label="Guarantees">
-          {TRUST.map((t) => (
-            <li key={t} className="trust-chip">
-              <svg viewBox="0 0 16 16" aria-hidden="true">
-                <path d="M3.5 8.5 6.5 11.5 12.5 5" />
-              </svg>
-              {t}
-            </li>
-          ))}
-        </ul>
         <div className="hero-ctas">
           <Link to="/create" className="btn btn-primary btn-lg">
             Create a poll
           </Link>
-          <a href="#open-polls" className="btn btn-secondary btn-lg">
+          <a href="#polls" className="btn btn-secondary btn-lg">
             Browse polls
           </a>
         </div>
+        <ul className="trust-chips" aria-label="Guarantees">
+          {TRUST.map((t) => (
+            <li key={t.label} className="trust-chip">
+              {t.icon}
+              {t.label}
+            </li>
+          ))}
+        </ul>
         <BlockRibbon chain={chain} />
       </div>
     </section>

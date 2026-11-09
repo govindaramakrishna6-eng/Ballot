@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import { targetChain } from "../config/chains";
 import { describeError, isNetworkError } from "../lib/errors";
 import { Details } from "./Details";
+import { BallotIcon } from "./icons";
 
 /** Error with retry. Unreachable RPCs get their own wording: the user did nothing wrong. */
 export function ErrorState({ error, onRetry }: { error: unknown; onRetry: () => void }) {
@@ -22,11 +23,23 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry: () => 
   );
 }
 
-export function EmptyState({ title, children }: { title: string; children?: React.ReactNode }) {
+/** Friendly empty state: an icon, one short line, and (usually) the obvious next action. */
+export function EmptyState({
+  title,
+  children,
+  icon = <BallotIcon />,
+  testId = "empty-state",
+}: {
+  title: string;
+  children?: React.ReactNode;
+  icon?: React.ReactNode;
+  testId?: string;
+}) {
   return (
-    <div className="notice" data-testid="empty-state">
-      <p className="font-semibold">{title}</p>
-      {children}
+    <div className="empty" data-testid={testId}>
+      <span className="empty-icon">{icon}</span>
+      <p className="empty-title">{title}</p>
+      {children && <div className="empty-body">{children}</div>}
     </div>
   );
 }

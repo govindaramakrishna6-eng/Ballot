@@ -1,5 +1,7 @@
 import { Link, useSearchParams } from "react-router";
+import { ChartIcon, DownloadIcon } from "../components/icons";
 import { ResultCard } from "../components/ResultCard";
+import { download, toCsv, toJson } from "../lib/share";
 import { Skeleton } from "../components/Skeleton";
 import { EmptyState, ErrorState } from "../components/States";
 import { useChainClock } from "../hooks/useChainClock";
@@ -30,9 +32,10 @@ export function ResultsPage() {
     .sort((a, b) => (b.totalVotes > a.totalVotes ? 1 : b.totalVotes < a.totalVotes ? -1 : Number(b.id - a.id)));
   const shown = tab === "final" ? final : live;
   const decidedVotes = final.reduce((n, p) => n + p.totalVotes, 0n);
+  const exportRows = shown.map((poll) => ({ poll, status: tab === "final" ? "closed" : "open" }));
 
   return (
-    <section aria-labelledby="results-page-title" className="mx-auto max-w-5xl">
+    <section aria-labelledby="results-page-title" className="page">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 id="results-page-title" className="display text-4xl">
@@ -41,9 +44,23 @@ export function ResultsPage() {
           <p className="muted mt-1">Every outcome here is counted by the contract from public on-chain votes — nobody can edit it.</p>
         </div>
         {!polls.isPending && !polls.isError && (
-          <p className="mono muted text-sm" data-testid="results-summary">
-            {final.length} decided · {decidedVotes.toString()} votes counted
-          </p>
+          <div className="flex flex-col items-end gap-2">
+            <p className="mono muted text-sm" data-testid="results-summary">
+              {final.length} decided · {decidedVotes.toString()} votes counted
+            </p>
+            {shown.length > 0 && (
+              <span className="actions-export">
+                <DownloadIcon className="icon-sm" />
+                <span className="muted text-sm">Export {tab === "final" ? "final" : "live"} results</span>
+                <button type="button" className="btn-chip" data-testid="export-all-csv" onClick={() => download(`ballot-${tab}-results.csv`, toCsv(exportRows), "text/csv")}>
+                  CSV
+                </button>
+                <button type="button" className="btn-chip" data-testid="export-all-json" onClick={() => download(`ballot-${tab}-results.json`, toJson(exportRows), "application/json")}>
+                  JSON
+                </button>
+              </span>
+            )}
+          </div>
         )}
       </div>
 
@@ -65,9 +82,9 @@ export function ResultsPage() {
 
       <div role="tabpanel" className="mt-5" aria-busy={polls.isPending}>
         {polls.isPending ? (
-          <ul className="poll-grid" aria-label="Loading results">
+          <ul className="grid-3" aria-label="Loading results">
             {[0, 1, 2].map((i) => (
-              <li key={i} className="result-card">
+              <li key={i} className="card">
                 <Skeleton className="h-4 w-1/3" />
                 <Skeleton className="mt-4 h-6 w-5/6" />
                 <Skeleton className="mt-4 h-3 w-full" />
@@ -79,21 +96,20 @@ export function ResultsPage() {
           <ErrorState error={polls.error} onRetry={() => void polls.refetch()} />
         ) : shown.length === 0 ? (
           tab === "final" ? (
-            <EmptyState title="No poll has closed yet.">
-              <p className="mt-1">Results become final the moment a poll's deadline passes.</p>
-              <button type="button" className="btn btn-secondary mt-3" onClick={() => setParams({ tab: "live" })}>
+            <EmptyState title="No poll has closed yet — results become final the moment a deadline passes." icon={<ChartIcon />}>
+              <button type="button" className="btn btn-secondary" onClick={() => setParams({ tab: "live" })}>
                 See live results
               </button>
             </EmptyState>
           ) : (
-            <EmptyState title="No open polls right now.">
-              <Link to="/create" className="btn btn-primary mt-3 inline-block">
+            <EmptyState title="No open polls right now." icon={<ChartIcon />}>
+              <Link to="/create" className="btn btn-primary">
                 Create a poll
               </Link>
             </EmptyState>
           )
         ) : (
-          <ul className="poll-grid" data-testid="results-list">
+          <ul className="grid-3" data-testid="results-list">
             {shown.map((p) => (
               <ResultCard key={p.id.toString()} poll={p} />
             ))}

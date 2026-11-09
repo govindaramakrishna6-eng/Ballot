@@ -424,3 +424,32 @@ Test/build results (actually observed): vitest 29 passed; tsc OK; oxlint 0 new; 
   sizes asserting the headline is below the header line and no sideways scroll; measured at 7 viewport sizes — no overlap.
 Commit made: feat(frontend): Home and Results in the header, results page, fix mobile hero overlap
 ```
+
+---
+
+## Homepage v2: featured poll, how it works, trust, activity, FAQ, empty states, search/filters/share/export, footer, symmetry
+
+### Decisions
+- **One grid for everything (symmetry request)**: every homepage section snaps to the same 3-column grid with one gap (1.5rem). How it works = 3 cards; featured = 2-col card + 1-col card; browse = 3-col grid; activity, trust and FAQ use a `split` that spans exactly 1 + 2 of those columns; footer = 3 columns. Verified by measurement (desktop column lefts 160/541/923 in every section) and by an E2E test that asserts identical left edges across sections.
+- **One radius / spacing / hover system**: 10px cards, 6px controls, one section rhythm (clamp 3.25–5.5rem), one hover lift for interactive cards; static info cards don't lift.
+- **Featured poll** = most-voted open poll (ties → closes soonest); with none open, the most recently closed (button becomes "View results"); none at all → empty state with "Create the first poll". Etherscan link goes to the poll's creation tx when it's within the readable log window, else to the contract.
+- **Page order**: hero (CTAs → trust badges → live blocks) → How it works → Featured → Browse (search + filters, 2 rows of 3) → Recent activity (2×2 so it matches the receipt height) → Trust & security → Stats → FAQ → footer. The section after the hero starts close so its heading peeks above the fold.
+- **Activity copy**: "Vote cast on ‘…’", "New poll created by 0x1234…abcd", "‘…’ closed with N votes" (+ winner/tie line), "‘…’ was cancelled…"; each item has an event label and relative time; whole item links to the poll.
+- **Search**: text in the question; `#12` = exactly poll 12; a bare number = id or text; `0x…` = creator address. Filters: All / Open / Closing soon (< 3 h) / Closed (incl. cancelled), plus Mine on /polls. /polls keeps filter + query in the URL.
+- **Share on X** uses the web intent (opens a pre-filled post; nothing is posted automatically). **Export** CSV/JSON is generated in the browser; CSV quotes every cell and defuses spreadsheet formulas (poll text is untrusted).
+- **FAQ** uses native `<details>` (keyboard/screen-reader friendly, no JS).
+- **No placeholder data was needed** — everything shown is read from the chain. The only missing real-world facts (repo, docs site, support contact) are optional env vars with real fallbacks (Sourcify verified source, How it works, FAQ) — nothing fake is published.
+
+```
+STATUS REPORT
+Done: all 10 requested items, in the requested priority order, on a measured symmetric grid.
+Files created/changed (paths): frontend/src/components/home/{FeaturedPoll,HowItWorks,TrustSection,Faq,SectionHead,Hero,
+  RecentActivity,NetworkStats,OpenPollCard}.tsx, components/{PollBrowser,PollActions,icons,Footer,States,ResultCard}.tsx,
+  pages/{Home,PollList,PollDetail,ResultsPage,MyVotes}.tsx, lib/{rank,share}.ts, config/env.ts, index.css,
+  lib/__tests__/{browse,env}.test.ts, e2e/{homepage-v2,home,experience,create,extras,navigation-results}.spec.ts,
+  frontend/.env.example, README.md, docs/screenshots/*
+How to run or verify: npm run dev; npm test; npm run e2e
+Test/build results (actually observed): vitest 35 passed; tsc OK; oxlint 0 new; build OK; E2E 46 passed (1.1m).
+Not done / known issues: footer GitHub/docs/support use fallbacks until VITE_SOURCE_URL / VITE_DOCS_URL / VITE_SUPPORT_URL are set.
+Commit made: feat(frontend): homepage v2 — featured poll, how it works, trust, FAQ, search/filters, share/export, footer, grid symmetry
+```

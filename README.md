@@ -59,8 +59,8 @@ flowchart LR
 | `frontend/src/contract/` | `deployments.json` (address + deploy block per chain) and the ABI — written by the deploy script. |
 | `frontend/src/hooks/useTx.ts` | The single path every write goes through (simulate, wallet, pending saved across refresh, decoded errors). |
 | `frontend/src/lib/errors.ts` | Turns contract errors like `AlreadyVoted` into sentences like "This wallet has already voted in this poll." |
-| `frontend/src/pages/` | Homepage (hero → open polls → recent activity → live stats), all polls (`/polls`), results (`/results`: final + live outcomes), create form, poll page, my votes. |
-| `frontend/e2e/` | 40 browser tests against a local blockchain, with a scriptable fake wallet. |
+| `frontend/src/pages/` | Homepage (hero → how it works → featured poll → browse with search/filters → recent activity → trust & security → stats → FAQ), all polls (`/polls`), results (`/results`: final + live outcomes), create form, poll page, my votes. |
+| `frontend/e2e/` | 46 browser tests against a local blockchain, with a scriptable fake wallet. |
 | `docs/BUILD_LOG.md` | Every phase's status report and every decision made along the way. |
 | `docs/screenshots/` | The finished app, light and dark. |
 
@@ -107,8 +107,8 @@ To vote locally, add network `http://127.0.0.1:8545` (chain id 31337) to MetaMas
 |---|---|---|
 | Contract | `cd contracts && npm test` | 45 |
 | Contract gas report | `cd contracts && npm run test:gas` | — |
-| Frontend unit | `cd frontend && npm test` | 29 |
-| End-to-end (starts its own chain + server) | `cd frontend && npm run e2e` | 40 |
+| Frontend unit | `cd frontend && npm test` | 35 |
+| End-to-end (starts its own chain + server) | `cd frontend && npm run e2e` | 46 |
 | Type check / build | `cd frontend && npm run typecheck && npm run build` | — |
 
 The end-to-end tests cover: creating a poll, voting, double votes, wrong network, rejecting in the wallet, not enough ETH,
@@ -159,6 +159,9 @@ already contains the rewrite that makes deep links like `/poll/3` work on refres
 | `VITE_WALLETCONNECT_PROJECT_ID` | You want QR-code / mobile wallets (free id from cloud.reown.com). Without it, browser wallets and MetaMask's in-app browser still work. |
 | `VITE_MAINNET_RPC_URL` | Your own mainnet RPC for ENS name lookups. |
 | `VITE_CHAIN` | Leave unset (Sepolia). `localhost` is for development. |
+| `VITE_SOURCE_URL` | Your GitHub repo, shown as "Source code" in the footer. Unset → the verified contract source on Sourcify. |
+| `VITE_DOCS_URL` | A documentation site for the footer. Unset → the homepage "How it works" section. |
+| `VITE_SUPPORT_URL` | Support link (`https://…` or `mailto:…`). Unset → the FAQ. |
 
 ## Design decisions
 

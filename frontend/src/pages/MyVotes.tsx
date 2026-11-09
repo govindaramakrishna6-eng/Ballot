@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Link } from "react-router";
 import { useAccount } from "wagmi";
+import { BallotIcon, WalletIcon } from "../components/icons";
 import { PollCard } from "../components/PollCard";
 import { Skeleton } from "../components/Skeleton";
 import { EmptyState, ErrorState } from "../components/States";
@@ -16,7 +17,7 @@ export function MyVotes() {
 
   let body: React.ReactNode;
   if (!address) {
-    body = <EmptyState title="Connect a wallet to see the polls you voted in." />;
+    body = <EmptyState title="Connect a wallet to see the polls you voted in." icon={<WalletIcon />} />;
   } else if (polls.isPending || (ids.length > 0 && voted.isPending)) {
     body = (
       <ul className="ledger" aria-label="Loading your votes">
@@ -40,8 +41,8 @@ export function MyVotes() {
     );
   } else if (mine.length === 0) {
     body = (
-      <EmptyState title="This wallet hasn't voted in any poll yet.">
-        <Link to="/" className="btn btn-primary mt-3 inline-block">
+      <EmptyState title="This wallet hasn't voted in any poll yet." icon={<BallotIcon />}>
+        <Link to="/polls?tab=open" className="btn btn-primary">
           Browse open polls
         </Link>
       </EmptyState>

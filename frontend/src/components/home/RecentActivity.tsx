@@ -6,29 +6,40 @@ import { useChainClock } from "../../hooks/useChainClock";
 import { buildFeed, type FeedItem } from "../../lib/activity";
 import { pluralVotes, shortAddress } from "../../lib/format";
 import { relativeTime } from "../../lib/relativeTime";
+import { computeResults } from "../../lib/results";
 import { Identicon } from "../Identicon";
+import { ActivityIcon } from "../icons";
 import { Skeleton } from "../Skeleton";
+import { EmptyState } from "../States";
 import { LatestReceipt } from "./LatestReceipt";
+import { SectionHead } from "./SectionHead";
 
-const SHOWN = 8;
+/** Four items = an even 2 × 2 grid, about the height of the receipt beside it. */
+const SHOWN = 4;
 
-function Sentence({ item }: { item: FeedItem }) {
-  const q = <span className="note-quote">‘{item.poll.title}’</span>;
+const KIND_LABEL: Record<FeedItem["kind"], string> = { vote: "Vote", created: "New poll", closed: "Closed", cancelled: "Cancelled" };
+
+/** Headline + one detail line per event — human sentences, wallets masked. */
+function describe(item: FeedItem): { headline: React.ReactNode; detail: React.ReactNode } {
+  const title = <span className="note-quote">‘{item.poll.title}’</span>;
   switch (item.kind) {
     case "vote":
-      return <>A wallet voted in {q}</>;
+      return { headline: <>Vote cast on {title}</>, detail: item.actor ? shortAddress(item.actor) : null };
     case "created":
-      return <>A new poll was created: {q}</>;
-    case "closed":
-      return <>{q} closed with {pluralVotes(item.poll.totalVotes)}.</>;
+      return { headline: <>New poll created by <span className="mono">{item.actor ? shortAddress(item.actor) : "a wallet"}</span></>, detail: <>{title}</> };
+    case "closed": {
+      const r = computeResults(item.poll.options, item.poll.voteCounts);
+      const verdict = r.noVotes ? "No votes cast" : r.tied ? "Ended in a tie" : `Winner: ${item.poll.options[r.leader!]}`;
+      return { headline: <>{title} closed with {pluralVotes(item.poll.totalVotes)}</>, detail: verdict };
+    }
     case "cancelled":
-      return <>{q} was cancelled by its creator.</>;
+      return { headline: <>{title} was cancelled by its creator</>, detail: "Cancelled before any votes" };
   }
 }
 
 /**
- * A light, human feed — sentences, not transaction rows. Every note links to its poll;
- * wallets are masked. Notes that arrive while you're watching slide in once.
+ * A light live feed: newest real ballot as a receipt (left third), recent events as an even grid
+ * (right two-thirds). New items fade in once; every item links to its poll.
  */
 export function RecentActivity({ chain, polls, loading, failed }: { chain: ChainEvents | undefined; polls: Poll[] | undefined; loading: boolean; failed: boolean }) {
   const { nowSec } = useChainClock();
@@ -48,51 +59,57 @@ export function RecentActivity({ chain, polls, loading, failed }: { chain: Chain
 
   return (
     <section className="home-section" aria-labelledby="activity-title">
-      <div className="section-bar">
-        <h2 id="activity-title" className="home-h2">
-          Recent activity
-        </h2>
-        <span className="live-chip" aria-hidden="true">
-          <span className="pulse-dot" /> Live
-        </span>
-      </div>
-      <div className="activity-layout">
-        {loading ? <Skeleton className="h-64 w-full" /> : <LatestReceipt chain={chain} polls={polls} />}
+      <SectionHead
+        id="activity-title"
+        kicker="On-chain, right now"
+        title="Recent activity"
+        action={
+          <span className="live-badge" data-testid="live-badge">
+            <span className="pulse-dot" aria-hidden="true" /> Live
+          </span>
+        }
+      />
+      <div className="split">
+        <div className="split-intro">{loading ? <Skeleton className="h-64 w-full" /> : <LatestReceipt chain={chain} polls={polls} />}</div>
         <div className="min-w-0">
-      {loading ? (
-            <ul className="note-grid" aria-label="Loading activity">
-              {[0, 1, 2].map((i) => (
-                <li key={i} className="note">
-                  <Skeleton className="h-4 w-5/6" />
-                  <Skeleton className="mt-2 h-4 w-1/2" />
+          {loading ? (
+            <ul className="grid-2" aria-label="Loading activity">
+              {[0, 1, 2, 3].map((i) => (
+                <li key={i} className="card">
+                  <Skeleton className="h-3 w-1/4" />
+                  <Skeleton className="mt-3 h-4 w-5/6" />
+                  <Skeleton className="mt-3 h-3 w-1/2" />
                 </li>
               ))}
             </ul>
           ) : failed ? (
-            <p className="hint">Recent activity isn't available right now. Polls and results still work.</p>
+            <EmptyState title="Recent activity isn't available right now. Polls and results still work." icon={<ActivityIcon />} testId="activity-unavailable" />
           ) : feed.length === 0 ? (
-            <p className="hint">It's quiet so far. Votes and new polls will show up here as they happen.</p>
+            <EmptyState title="It's quiet so far. Votes and new polls will appear here the moment they're on-chain." icon={<ActivityIcon />} testId="activity-empty">
+              <Link to="/create" className="btn btn-primary">
+                Create the first poll
+              </Link>
+            </EmptyState>
           ) : (
-            <ul className="note-grid" data-testid="activity">
-              {feed.map((item) => (
-                <li key={item.id} className={fresh.has(item.id) ? "note-in" : ""}>
-                  <Link to={`/poll/${item.poll.id}`} className={`note note-${item.kind}`} data-testid={`activity-${item.kind}`}>
-                    <span className="note-text">
-                      <Sentence item={item} />
-                    </span>
-                    <span className="note-meta">
-                      {item.actor && <Identicon address={item.actor} size={14} />}
-                      {item.actor && (
-                        <span className="mono" title={item.actor}>
-                          {shortAddress(item.actor)}
-                        </span>
-                      )}
-                      {item.actor && item.at !== null && <span aria-hidden="true">·</span>}
-                      {item.at !== null && <span>{relativeTime(item.at, nowSec)}</span>}
-                    </span>
-                  </Link>
-                </li>
-              ))}
+            <ul className="grid-2" data-testid="activity">
+              {feed.map((item) => {
+                const { headline, detail } = describe(item);
+                return (
+                  <li key={item.id} className={fresh.has(item.id) ? "note-in" : ""}>
+                    <Link to={`/poll/${item.poll.id}`} className={`card note note-${item.kind}`} data-testid={`activity-${item.kind}`}>
+                      <span className="note-top">
+                        <span className={`note-kind note-kind-${item.kind}`}>{KIND_LABEL[item.kind]}</span>
+                        {item.at !== null && <span className="note-time">{relativeTime(item.at, nowSec)}</span>}
+                      </span>
+                      <span className="note-text">{headline}</span>
+                      <span className="note-meta">
+                        {item.actor && item.kind === "vote" && <Identicon address={item.actor} size={14} />}
+                        <span className={item.kind === "vote" ? "mono" : "truncate"}>{detail}</span>
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>

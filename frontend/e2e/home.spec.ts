@@ -14,8 +14,8 @@ test.describe("Homepage", () => {
     const box = (await hero.boundingBox())!;
     expect(Math.abs(box.y + box.height / 2 - 450)).toBeLessThan(4);
 
-    // Open polls start right after the hero: their heading is visible without scrolling.
-    await expect(page.getByRole("heading", { name: "Open polls" })).toBeInViewport();
+    // The next section starts right after the hero: its heading peeks above the fold.
+    await expect(page.getByRole("heading", { name: "How it works" })).toBeInViewport();
 
     await hero.getByRole("link", { name: "Browse polls" }).click();
     await expect(page.getByRole("heading", { name: "Open polls" })).toBeInViewport();
@@ -51,12 +51,12 @@ test.describe("Homepage", () => {
     await chain.vote(id, 0, 17);
     await page.goto("/");
     const activity = page.getByTestId("activity");
-    await expect(activity.getByTestId("activity-vote").filter({ hasText: title }).first()).toContainText(`A wallet voted in ‘${title}’`);
-    await expect(activity.getByTestId("activity-created").filter({ hasText: title })).toContainText(`A new poll was created: ‘${title}’`);
+    await expect(activity.getByTestId("activity-vote").filter({ hasText: title }).first()).toContainText(`Vote cast on ‘${title}’`);
+    await expect(activity.getByTestId("activity-created").filter({ hasText: title })).toContainText(/New poll created by 0x[0-9a-fA-F]{4}…[0-9a-fA-F]{4}/);
     await expect(activity.getByTestId("activity-vote").filter({ hasText: title }).first()).toContainText(/0x[0-9a-fA-F]{4}…[0-9a-fA-F]{4}/);
 
     await chain.timeTravel(500);
-    await expect(activity.getByTestId("activity-closed").filter({ hasText: title })).toContainText(`‘${title}’ closed with 1 vote.`);
+    await expect(activity.getByTestId("activity-closed").filter({ hasText: title })).toContainText(`‘${title}’ closed with 1 vote`);
     await activity.getByTestId("activity-created").filter({ hasText: title }).click();
     await expect(page).toHaveURL(new RegExp(`/poll/${id}$`));
   });

@@ -48,6 +48,6 @@ test.describe("Create poll", () => {
     await expect(page.getByTestId("empty-state")).toContainText("Connect a wallet");
     await wallet.connect();
     await expect(page.locator(`[data-poll-id="${mine}"]`)).toBeVisible();
-    await expect(page.getByTestId("poll-card")).toHaveCount(1);
+    await expect(page.getByTestId("open-poll-card")).toHaveCount(1);
   });
 });

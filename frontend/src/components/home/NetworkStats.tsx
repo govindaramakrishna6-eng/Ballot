@@ -4,6 +4,7 @@ import { useChainClock } from "../../hooks/useChainClock";
 import { useCountUp } from "../../hooks/useCountUp";
 import { uniqueWallets } from "../../lib/activity";
 import { pollStatus } from "../../lib/status";
+import { SectionHead } from "./SectionHead";
 
 function Stat({ value, label, plus = false }: { value: number; label: string; plus?: boolean }) {
   const shown = useCountUp(value);
@@ -24,9 +25,7 @@ export function NetworkStats({ polls, chain }: { polls: Poll[] | undefined; chai
   const all = polls ?? [];
   return (
     <section className="home-section" aria-labelledby="stats-title">
-      <h2 id="stats-title" className="sr-only">
-        Live stats
-      </h2>
+      <SectionHead id="stats-title" kicker="Live network stats" title="Ballot in numbers" />
       <dl className="stats" data-testid="stats">
         <Stat value={all.filter((p) => pollStatus(p, nowSec) === "open").length} label="Active open polls" />
         <Stat value={all.reduce((n, p) => n + Number(p.totalVotes), 0)} label="Total votes cast" />

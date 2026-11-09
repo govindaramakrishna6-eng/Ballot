@@ -38,7 +38,7 @@ export function ResultCard({ poll }: { poll: Poll }) {
   }
 
   return (
-    <li className="result-card" data-testid="result-card" data-poll-id={poll.id.toString()}>
+    <li className="card result-card" data-testid="result-card" data-poll-id={poll.id.toString()}>
       <div className="flex items-center justify-between gap-3">
         <StatusPill status={displayStatus(poll, nowSec)} />
         <span className="mono muted text-xs">

@@ -15,6 +15,10 @@ export type AppEnv = {
   localRpcUrl: string;
   mainnetRpcUrl: string;
   walletConnectProjectId: string | null;
+  /** Optional footer links; unset → sensible real fallbacks (verified source on Sourcify, in-page FAQ). */
+  sourceUrl: string | null;
+  docsUrl: string | null;
+  supportUrl: string | null;
 };
 
 export type EnvProblem = { name: string; problem: string };
@@ -55,6 +59,17 @@ export function readEnv(source: Record<string, string | undefined> = import.meta
     problems.push({ name: "VITE_WALLETCONNECT_PROJECT_ID", problem: "must be the 32-character id from cloud.reown.com, or left empty." });
   }
 
+  const optionalLink = (name: string, allowMailto = false): string | null => {
+    const v = source[name]?.trim();
+    if (!v) return null;
+    if (isHttpUrl(v) || (allowMailto && /^mailto:[^\s@]+@[^\s@]+$/.test(v))) return v;
+    problems.push({ name, problem: allowMailto ? "must be an http(s) URL or a mailto: address." : "must be an http(s) URL." });
+    return null;
+  };
+  const sourceUrl = optionalLink("VITE_SOURCE_URL");
+  const docsUrl = optionalLink("VITE_DOCS_URL");
+  const supportUrl = optionalLink("VITE_SUPPORT_URL", true);
+
   return {
     env: {
       chain: chainRaw === "localhost" ? "localhost" : "sepolia",
@@ -62,6 +77,9 @@ export function readEnv(source: Record<string, string | undefined> = import.meta
       localRpcUrl: local,
       mainnetRpcUrl: mainnet,
       walletConnectProjectId: wc,
+      sourceUrl,
+      docsUrl,
+      supportUrl,
     },
     problems,
   };

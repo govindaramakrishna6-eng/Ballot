@@ -21,8 +21,8 @@ test.describe("Phase 6 extras", () => {
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
     const id = await chain.createPoll({ title: "Share me" });
     await page.goto(`/poll/${id}`);
-    await page.getByTestId("share").click();
-    await expect(page.getByTestId("share-status")).toHaveText("Link copied");
+    await page.getByTestId("copy-link").click();
+    await expect(page.getByTestId("copy-link")).toHaveText("Link copied");
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(`http://localhost:5190/poll/${id}`);
   });
 });

@@ -402,3 +402,25 @@ Test/build results (actually observed): vitest 29 passed; tsc OK; oxlint 0 new; 
 Not done / known issues: voter stack shows wallets from the readable log window (~2.8 days on public RPC); the count is always exact.
 Commit made: feat(frontend): on-chain experience — identicons, live block ribbon, tx journey seal, live results, create preview
 ```
+
+---
+
+## Header: Home + Results; mobile overlap fix
+
+### Decisions
+- **Header links: Home · Polls · Results · Create · My votes** (the "Ballot" wordmark still goes home too).
+- **New `/results` page**: "Final results" (closed polls, most recently closed first — these can never change) and "Live results" (open polls, most votes first). Each card states the verdict in words — Winner / Tied (with the tied options) / Leading / "No votes were cast" — then the top 3 options as ink bars and a "Full results" link. Cancelled polls are left out (they have no result; still listed under Polls → Closed). Summary: "N decided · N votes counted".
+- **Mobile overlap root cause**: the hero was centred with a negative top margin sized for a tall screen. On real phones (browser bars make the visible height ~560–660px) the content was taller than the hero, so the margin pulled the headline up across the line under the header. Reproduced at 375×560, 390×664, 360×640.
+- **Fix**: centre with extra bottom padding instead (padding can't move content above its box), and measure the header + banner height live (ResizeObserver → `--chrome`) instead of hard-coded rem values. Exact centring kept wherever it fits (1440×900 → 450/450, 900×800 → 400/400, 390×844 → 422/422); on shorter screens the hero sits below the header with a 56px gap.
+- **Mobile header** is now two rows: wordmark + wallet, then the five links on their own swipeable row (no unpredictable wrapping). Desktop stays one row.
+
+```
+STATUS REPORT
+Done: Home + Results header links; Results page; mobile overlap fixed; mobile header redesigned.
+Files created/changed (paths): frontend/src/components/{Layout,ResultCard}.tsx, pages/ResultsPage.tsx, App.tsx, index.css,
+  e2e/{navigation-results,screenshots}.spec.ts, README.md, docs/screenshots/*
+How to run or verify: npm run dev → /results; resize to a phone; npm run e2e
+Test/build results (actually observed): vitest 29 passed; tsc OK; oxlint 0 new; build OK; E2E 40 passed (1.0m) incl. 4 phone
+  sizes asserting the headline is below the header line and no sideways scroll; measured at 7 viewport sizes — no overlap.
+Commit made: feat(frontend): Home and Results in the header, results page, fix mobile hero overlap
+```

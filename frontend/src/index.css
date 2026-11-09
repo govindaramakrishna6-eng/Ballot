@@ -56,10 +56,22 @@ code { font-family: var(--mono); font-size: .9em; }
 /* ---------- layout ---------- */
 .wrap { max-width: 72rem; margin: 0 auto; padding-left: 1rem; padding-right: 1rem; }
 .site-header { border-bottom: 2px solid var(--ink); }
+/* Desktop: brand | links | wallet on one row. Phones: brand + wallet on top, links on their own
+   swipeable row below — so nothing wraps unpredictably or collides with the line under the header. */
+.header-grid { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "brand nav wallet"; align-items: center; gap: .75rem 1rem; padding-top: .75rem; padding-bottom: .75rem; }
+.header-grid > .brand { grid-area: brand; }
+.main-nav { grid-area: nav; display: flex; justify-content: center; gap: .25rem; }
+.header-wallet { grid-area: wallet; justify-self: end; }
+@media (max-width: 859px) {
+  .header-grid { grid-template-columns: 1fr auto; grid-template-areas: "brand wallet" "nav nav"; padding-bottom: 0; }
+  .main-nav { justify-content: flex-start; overflow-x: auto; scrollbar-width: none; margin: 0 -1rem; padding: 0 1rem .55rem; border-top: 1px solid var(--line); padding-top: .45rem; }
+  .main-nav::-webkit-scrollbar { display: none; }
+  .nav-link { white-space: nowrap; }
+}
 .brand { font-family: var(--serif); font-weight: 700; font-size: 1.45rem; letter-spacing: -0.01em; }
-.nav-link { padding: .25rem .5rem; color: var(--muted); }
+.nav-link { padding: .35rem .6rem; color: var(--muted); }
 .nav-link:hover { color: var(--ink); }
-.nav-link-active { color: var(--ink); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px; }
+.nav-link-active { color: var(--ink); font-weight: 600; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px; }
 .skip-link { position: absolute; left: -999px; }
 .skip-link:focus { left: 1rem; top: 1rem; z-index: 50; background: var(--paper); border: 2px solid var(--ink); padding: .5rem .75rem; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
@@ -216,14 +228,18 @@ input[type="datetime-local"].input { width: auto; }
 
 /* Hero fills the first screen below the header, so its content sits at the exact centre of what's visible.
    --chrome = header height + main's top padding (the header wraps to two rows on small screens). */
-:root { --chrome: 5.625rem; } /* measured: header 66px + main padding 24px */
-@media (max-width: 639px) { :root { --chrome: 8.6rem; } }
+:root { --chrome: 5.625rem; } /* first-paint fallback; Layout measures and sets the real value */
 /* --peek: how much of "Open polls" shows above the fold, so polls are visible on landing. */
 :root { --peek: 5.5rem; }
-.hero { min-height: calc(100svh - var(--chrome) - var(--peek)); display: grid; place-items: center; text-align: center; padding: 2rem 0 0; }
-/* A grid item's margin moves its centre by half that amount; this offset puts the block's centre at the
-   exact centre of the viewport (not of the area below the header, and despite the peek). */
-.hero-inner { max-width: 76rem; margin-top: calc(var(--peek) - var(--chrome) - 2rem); }
+/* Extra bottom padding shifts the centred block up by half its size, putting the block's centre at the
+   viewport's centre. Unlike a negative margin, padding can never pull content above the hero, so on
+   short phone screens the headline can't run into the header line. */
+.hero {
+  min-height: calc(100svh - var(--chrome) - var(--peek));
+  display: grid; place-items: center; text-align: center;
+  padding: 2rem 0 max(0px, calc(var(--chrome) + 2rem - var(--peek)));
+}
+.hero-inner { max-width: 76rem; }
 /* Same face as the "Ballot" wordmark: Fraunces 700 with the wordmark's small-size optical cut
    (opsz 23, sturdier and lower-contrast than the display cut) and its -0.01em tracking — just bigger. */
 .hero-title {
@@ -452,3 +468,8 @@ input[type="datetime-local"].input { width: auto; }
 .toast-dot { width: .6rem; height: .6rem; border-radius: 50%; background: var(--muted); flex: none; }
 @media (prefers-reduced-motion: no-preference) { .toast { animation: toast 3.2s ease both; } }
 @keyframes toast { 0% { opacity: 0; transform: translateY(12px); } 10%, 85% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(6px); } }
+
+/* Results page */
+.result-card { display: flex; flex-direction: column; gap: .75rem; background: var(--paper); border: 1.5px solid var(--line); padding: 1.15rem 1.2rem 1.1rem; transition: border-color .15s ease, transform .15s ease; }
+.result-card:hover, .result-card:focus-within { border-color: var(--ink); transform: translateY(-2px); }
+.result-verdict { font-size: .95rem; overflow-wrap: anywhere; }

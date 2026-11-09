@@ -35,6 +35,11 @@ for (const scheme of ["light", "dark"] as const) {
     await page.screenshot({ path: `${OUT}/vote-sealed-${scheme}.png` });
     await page.screenshot({ path: `${OUT}/poll-${scheme}.png`, fullPage: true });
 
+    await page.goto("/results?tab=live");
+    await expect(page.getByTestId("results-list")).toBeVisible();
+    await page.waitForTimeout(900);
+    await page.screenshot({ path: `${OUT}/results-${scheme}.png`, fullPage: true });
+
     await page.goto("/create");
     await page.getByLabel("Question").fill("Where should the new bench go?");
     await page.getByPlaceholder("Option 1").fill("By the pond");

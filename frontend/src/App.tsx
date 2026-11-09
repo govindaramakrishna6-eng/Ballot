@@ -6,6 +6,7 @@ import { Home } from "./pages/Home";
 import { MyVotes } from "./pages/MyVotes";
 import { PollDetail } from "./pages/PollDetail";
 import { PollList } from "./pages/PollList";
+import { ResultsPage } from "./pages/ResultsPage";
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
       <Route element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="polls" element={<PollList />} />
+        <Route path="results" element={<ResultsPage />} />
         <Route path="create" element={<CreatePoll />} />
         <Route path="poll/:id" element={<PollDetail />} />
         <Route path="me" element={<MyVotes />} />

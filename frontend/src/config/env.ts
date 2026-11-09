@@ -35,7 +35,22 @@ function isHttpUrl(s: string): boolean {
   }
 }
 
-export function readEnv(source: Record<string, string | undefined> = import.meta.env): { env: AppEnv; problems: EnvProblem[] } {
+/**
+ * Only the variables the app uses, named one by one. Passing `import.meta.env` whole would make Vite
+ * bundle every VITE_* variable the host defines (Vercel injects ~20 of its own) into public JS.
+ */
+const BUILD_ENV: Record<string, string | undefined> = {
+  VITE_CHAIN: import.meta.env.VITE_CHAIN,
+  VITE_SEPOLIA_RPC_URL: import.meta.env.VITE_SEPOLIA_RPC_URL,
+  VITE_LOCAL_RPC_URL: import.meta.env.VITE_LOCAL_RPC_URL,
+  VITE_MAINNET_RPC_URL: import.meta.env.VITE_MAINNET_RPC_URL,
+  VITE_WALLETCONNECT_PROJECT_ID: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID,
+  VITE_SOURCE_URL: import.meta.env.VITE_SOURCE_URL,
+  VITE_DOCS_URL: import.meta.env.VITE_DOCS_URL,
+  VITE_SUPPORT_URL: import.meta.env.VITE_SUPPORT_URL,
+};
+
+export function readEnv(source: Record<string, string | undefined> = BUILD_ENV): { env: AppEnv; problems: EnvProblem[] } {
   const problems: EnvProblem[] = [];
 
   const chainRaw = source.VITE_CHAIN?.trim() || "sepolia";

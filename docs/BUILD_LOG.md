@@ -453,3 +453,28 @@ Test/build results (actually observed): vitest 35 passed; tsc OK; oxlint 0 new; 
 Not done / known issues: footer GitHub/docs/support use fallbacks until VITE_SOURCE_URL / VITE_DOCS_URL / VITE_SUPPORT_URL are set.
 Commit made: feat(frontend): homepage v2 — featured poll, how it works, trust, FAQ, search/filters, share/export, footer, grid symmetry
 ```
+
+---
+
+## Security review: MetaMask "phishing / wallet-draining" warning at connect
+
+See `docs/SECURITY-REVIEW.md` for the full report.
+
+### Decisions
+- **Root cause = domain reputation, not app behaviour** — warning appears at connect (before any tx). Not on MetaMask's public blocklist (checked against 118,441 entries today), but 2,001 `*.vercel.app` subdomains are, so new vercel.app sites start untrusted. Owner actions: custom domain + false-positive reports (pre-filled text provided). Not submitted on the owner's behalf.
+- **Proved what the wallet is asked**: instrumented a real vote on the production build under production headers — only `wallet_requestPermissions`, `eth_requestAccounts`, and one value-less `eth_sendTransaction` to our contract calling `vote` (selector checked). No signatures or approvals exist in the code.
+- **Verified the live deployment equals the audited build** (byte-identical except Vercel's injected metadata and resulting chunk-name hashes).
+- **Added CSP + Permissions-Policy + COOP** (script-src 'self', frame-ancestors 'none', no eval); `connect-src https: wss:` so the documented RPC overrides keep working. Tested with the exact headers before deploying: 0 violations.
+- **Stopped bundling host env**: env.ts reads named variables only (Vite was inlining all of Vercel's VITE_VERCEL_* metadata).
+
+```
+STATUS REPORT
+Done: wallet-request audit, live-deployment verification, blocklist check, CSP/permissions hardening, env hygiene,
+  security review doc with pre-filled false-positive report.
+Files created/changed (paths): frontend/vercel.json, frontend/src/config/env.ts, docs/SECURITY-REVIEW.md
+How to run or verify: see "How to re-run the checks" in docs/SECURITY-REVIEW.md
+Test/build results (actually observed): vitest 35 passed; E2E 46 passed (1.4m); CSP test on production build: 0 violations,
+  0 console errors, live Sepolia data loaded, wallet modal opened; CSP test of a full vote: confirmed, 0 violations.
+Not done / known issues: the warning itself can only be cleared by the owner (custom domain and/or false-positive reports).
+Commit made: security: CSP and permissions headers, stop bundling host env, wallet-connection security review
+```

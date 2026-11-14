@@ -1,0 +1,27 @@
+1
+00:00:00,300 --> 00:00:07,800
+This is Ballot: polls on Ethereum where every single vote can be proven.
+Anyone can create a poll, and every wallet gets exactly one vote.
+
+2
+00:00:08,000 --> 00:00:10,800
+First, connect your wallet.
+
+3
+00:00:11,000 --> 00:00:21,800
+Then create a poll: a question, two to ten options, and a deadline.
+The smart contract enforces the rules, and once it's signed, nobody can edit it, not even us.
+
+4
+00:00:22,000 --> 00:00:34,800
+To vote, pick an option. The app checks your vote before your wallet even opens.
+Once it's confirmed, you get a ballot receipt: the transaction, block and time, read straight from the blockchain.
+Anyone can verify it on Etherscan.
+
+5
+00:00:35,000 --> 00:00:40,800
+Results update live, for everyone, with no wallet needed.
+
+6
+00:00:41,200 --> 00:00:44,800
+Ballot. Every vote, provable.

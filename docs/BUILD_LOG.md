@@ -627,3 +627,9 @@ Commit made: feat: calmer backdrop, plain receipt/stats boxes, green wallet butt
 - Decisions: the captions are drawn into the page, not burned in afterwards, so they use the app's own fonts. A drawn cursor
   shows because headless recordings have none. There's no voice-over because no speech tool is available, so captions
   carry the story. The local chain was used so the video needs no test ETH and shows real transactions.
+- Voice-over added (owner request). The script is in `docs/ballot-voiceover.srt`, timed to each scene. Speech was made offline
+  with sherpa-onnx 2.0.1 and the Kokoro int8 multi-lang v1.0 model (voice "af_heart", Apache-2.0, downloaded from the
+  sherpa-onnx GitHub releases; the model is not committed). The model's US-English dictionary was missing six words
+  (gets, enforces, opens, results, Ethereum, Etherscan), so I added their pronunciations; without them the engine silently
+  skipped those words. Each line fits its slot (longest 12.0 s in a 12.8 s slot). The mix was loudness-normalised to -16 LUFS
+  and muxed into `docs/ballot-explainer.mp4` as AAC.

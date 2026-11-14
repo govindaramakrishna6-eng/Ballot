@@ -560,3 +560,21 @@ Files created/changed (paths): frontend/src/index.css (calm layer), frontend/src
 Test/build results (actually observed): vitest 38 passed; tsc OK; oxlint 0 new; E2E 51 passed (1.6m); ticker text 4.68:1.
 Commit made: style: calm pass — colour only for primary actions, live, verified and status
 ```
+
+---
+
+## Hero backdrop: ballot grid + glow (owner feedback)
+
+### Decisions
+- **Graph-paper grid removed site-wide** — it read as a chart/trading backdrop. Pages are plain cream paper.
+- **Hero = full-width near-black band `#07070B`** with a tiled SVG of ticked and unticked ballots (white strokes, layer opacity 6%, radial mask fading toward the edges) and one violet→blue radial glow (≈30% → 12%) behind the headline. Pure CSS/inline SVG — no images, no requests, CSP-safe.
+- **On the dark band**: title `#F7F5F0` (18.5:1), subtitle/chips `#A9AEC0` (9.1:1, 6.4:1 at the glow's peak), focus ring `#FF8A70` (8.7:1); "Create a poll" stays tomato with a soft tomato halo as the one colourful element; "Browse polls" is a light outline.
+- **Centring kept exact**: the band is pulled up under main's padding to meet the ticker, with height/padding adjusted so the content centre is still the viewport centre (1440×900 → 450/450, 390×844 → 422/422). The glow is clipped (`overflow: clip`) after a phone check showed it caused 20px of sideways scroll.
+
+```
+STATUS REPORT
+Done: graph-paper grid removed; dark hero band with ballot-grid texture and a soft violet/blue glow.
+Files created/changed (paths): frontend/src/index.css, CLAUDE.md, docs/screenshots/*
+Test/build results (actually observed): vitest 38 passed; tsc OK; oxlint 0 new; E2E 51 passed (1.6m); no sideways scroll at 375/390 px.
+Commit made: style(hero): ballot-grid texture and soft glow on a near-black band; drop the graph-paper grid
+```

@@ -1079,3 +1079,57 @@ a.tk-item:hover, a.tk-item:focus-visible { background: color-mix(in srgb, var(--
 .footer-col a:hover { color: var(--ink); }
 .footer-h { color: var(--ink); }
 .network-status .pulse-dot { background: var(--faint); animation: none; }
+
+
+/* =====================================================================
+   Hero backdrop (owner feedback): no graph-paper grid. The hero is a
+   near-black band with a faint grid of ballot shapes (~5%) and one soft
+   violet/blue glow behind the headline — trust and verification, not charts.
+   ===================================================================== */
+body { background-image: none; overflow-x: clip; }
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  /* full-bleed band, pulled up under main's top padding so it meets the ticker */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-top: -1.5rem;
+  min-height: calc(100svh - var(--chrome) + 1.5rem - var(--peek));
+  padding-top: 3.5rem;
+  overflow: clip; /* the glow is wider than a phone screen — never let it cause sideways scroll */
+  background: #07070B;
+  color: #F2F0EA;
+}
+.hero::before {
+  /* the ballot grid: evenly spaced, white at ~5%, fading out toward the edges */
+  content: "";
+  position: absolute; inset: 0; z-index: -1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='8' width='18' height='22' rx='2.5'/%3E%3Cpath d='M13.5 19.5l3.2 3.2 5.8-6.4'/%3E%3Crect x='45' y='44' width='18' height='22' rx='2.5'/%3E%3Cpath d='M49.5 52h9M49.5 57h6'/%3E%3C/svg%3E");
+  background-size: 72px 72px;
+  background-position: center;
+  opacity: .06;
+  -webkit-mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, #000 35%, transparent 100%);
+          mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, #000 35%, transparent 100%);
+}
+.hero::after {
+  /* one restrained violet/blue glow behind the headline */
+  content: "";
+  position: absolute; z-index: -1; pointer-events: none;
+  left: 50%; top: 44%; width: min(980px, 110vw); height: 560px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(closest-side, rgb(124 108 255 / .30), rgb(64 120 255 / .12) 55%, transparent 100%);
+  filter: blur(8px);
+}
+.hero-title { color: #F7F5F0; }
+.hero-sub { color: #A9AEC0; }
+.hero .btn-secondary { background: transparent; color: #F2F0EA; border-color: rgb(242 240 234 / .55); box-shadow: none; }
+.hero .btn-secondary:hover:not(:disabled) { background: rgb(242 240 234 / .08); color: #F2F0EA; transform: none; box-shadow: none; }
+.hero .btn-primary { border-color: #07070B; box-shadow: 0 0 0 1px rgb(255 107 74 / .35), 0 10px 30px -12px rgb(255 107 74 / .55); }
+.hero .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 0 0 1px rgb(255 107 74 / .45), 0 14px 34px -12px rgb(255 107 74 / .65); }
+.hero .btn-primary:active:not(:disabled) { transform: translateY(1px); }
+.hero .trust-chip { color: #A9AEC0; border-color: rgb(242 240 234 / .16); background: rgb(255 255 255 / .02); }
+.hero .trust-chip svg { stroke: #A9AEC0; }
+.hero :focus-visible { outline-color: #FF8A70; }
+/* the band meets the ticker directly */
+.ticker { border-bottom: 0; }

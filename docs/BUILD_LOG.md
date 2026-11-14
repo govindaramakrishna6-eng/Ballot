@@ -648,3 +648,14 @@ Commit made: feat: calmer backdrop, plain receipt/stats boxes, green wallet butt
 - Rebuild: `python frontend/scripts/video/voice.py …`, then `VIDEO=1 VO_DURS=<durs.json> npm run video`, then the mix
   (each clip at its mark, trimmed by trimStartMs, loudness -16 LUFS, H.264 + AAC).
 - v2 tweak (owner): chapter labels removed. The subtitle is now one slim line (15px, 12px from the bottom, 86% opaque), so it covers much less of the screen. The mix step is saved as frontend/scripts/video/mix.py.
+
+## Explainer video on the homepage (owner request: embedded, not a link, with play/pause)
+
+- The video is embedded under "How it works" with a native `<video controls>` (play/pause, seek, volume, fullscreen,
+  keyboard and screen-reader friendly).
+- Decisions: it's self-hosted in `frontend/public/` (re-encoded for the web at CRF 26, 5.3 MB) rather than YouTube. It's
+  same-origin, so the CSP is unchanged and there are no third-party trackers. `preload="none"` plus a poster
+  (the end card) means visitors download nothing until they press play. It doesn't autoplay, because a voice starting
+  unprompted is jarring, and the intro already plays sound.
+- E2E (homepage-v2.spec): the video has controls, the file is served as video/mp4, and it actually plays and pauses.
+  Result: 56 passed.

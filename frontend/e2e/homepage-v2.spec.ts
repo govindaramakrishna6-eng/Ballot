@@ -25,6 +25,18 @@ test.describe("Homepage v2", () => {
     const how = page.locator("#how-it-works");
     for (const t of ["Connect your wallet", "Create or vote in a poll", "Verify results on Etherscan"]) await expect(how.getByRole("heading", { name: t })).toBeVisible();
 
+    // The explainer is embedded (not a link), has the browser's play/pause controls, and is actually playable.
+    const video = how.getByTestId("explainer-video");
+    await expect(video).toHaveAttribute("controls", "");
+    await expect(video).toHaveAttribute("preload", "none");
+    const res = await page.request.get("/ballot-explainer.mp4");
+    expect(res.ok()).toBe(true);
+    expect(res.headers()["content-type"]).toContain("video/mp4");
+    await video.evaluate((v: HTMLVideoElement) => { v.muted = true; return v.play(); });
+    await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.currentTime)).toBeGreaterThan(0.2);
+    await video.evaluate((v: HTMLVideoElement) => v.pause());
+    await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
+
     const trust = page.getByTestId("trust-points");
     for (const t of ["Votes are recorded on-chain", "Independently verifiable", "Immutable, no admin controls", "You keep custody"]) await expect(trust).toContainText(t);
 

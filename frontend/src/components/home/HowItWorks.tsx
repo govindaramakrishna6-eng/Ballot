@@ -37,6 +37,27 @@ export function HowItWorks() {
           </li>
         ))}
       </ol>
+      {/* Self-hosted (same origin, so the CSP needs no change). preload="none" keeps the homepage light:
+          the 5 MB file only downloads when someone presses play. Captions are burned into the video. */}
+      <figure className="card explainer" data-testid="explainer">
+        <video
+          className="explainer-video"
+          controls
+          preload="none"
+          playsInline
+          poster="/explainer-poster.jpg"
+          width={1280}
+          height={720}
+          aria-label="Ballot explained in 2 minutes, with narration and on-screen captions"
+          data-testid="explainer-video"
+        >
+          <source src="/ballot-explainer.mp4" type="video/mp4" />
+          Your browser can't play this video.
+        </video>
+        <figcaption className="explainer-cap">
+          <span className="mono">2:00</span> Watch the whole journey: create a poll, vote, get your receipt, and see the result.
+        </figcaption>
+      </figure>
     </section>
   );
 }

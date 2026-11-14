@@ -500,3 +500,22 @@ How to run or verify: open the site in a new tab (or clear sessionStorage) to se
 Test/build results (actually observed): vitest 35 passed; tsc OK; oxlint 0 new; build OK; E2E 50 passed (1.6m).
 Commit made: feat(brand): logo mark, favicon and a once-per-session intro animation
 ```
+
+---
+
+## Live ticker + results dashboard
+
+### Decisions
+- **Market-tape ticker under the header, site-wide** (replaces the hero block ribbon): newest blocks (number, tx count, age; link to Etherscan), open polls by votes (leader %, vote count with ▲ for a minute after new votes, time left), latest votes. rAF-driven at 42 px/s so content can update without the loop jumping; pauses on hover/focus; the duplicate copy is `aria-hidden` + `inert`; reduced motion → a still, scrollable row.
+- **Results dashboard** (dataviz method followed; form before colour): KPI tiles (votes counted, decided, live, avg per poll) with count-up; "Most voted" as ranked horizontal bars (one hue); "Votes over time" as a single-series cumulative area with crosshair + tooltip (keyboard arrows too); result cards with a thin segmented part-to-whole bar + legend carrying every name and figure (never colour alone). Donut/pie avoided per the method (bars compare more exactly).
+- **Categorical colours validated** with the dataviz validator on Ballot's own surfaces: light `#f4efe4` — all checks pass (contrast relief via direct labels); dark `#1b1a17` — all checks pass. Colour follows the option index, never its rank; options beyond slot 6 fold to a neutral "other" swatch.
+- Votes older than the public RPC's log window still count: they form the curve's starting baseline, labelled "last ~3 days in detail".
+
+```
+STATUS REPORT
+Done: live ticker; results dashboard with KPIs, ranked bars, area chart + tooltip, segmented bars + legends.
+Files created/changed (paths): frontend/src/components/{LiveTicker,ResultCard,Layout}.tsx, components/charts/*, hooks/{useChainClock,
+  useVoteTimeline}.ts(x), lib/timeline.ts, pages/ResultsPage.tsx, components/home/Hero.tsx (ribbon removed), index.css, tests
+Test/build results (actually observed): vitest 38 passed; tsc OK; oxlint 0 new; E2E 51 passed (1.7m).
+Commit made: feat(frontend): live market-tape ticker and a charted results dashboard
+```

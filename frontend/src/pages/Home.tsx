@@ -31,7 +31,7 @@ export function Home() {
 
   return (
     <>
-      <Hero chain={chain.data} />
+      <Hero />
       <HowItWorks />
       <FeaturedPoll polls={polls.data} chain={chain.data} loading={polls.isPending} />
       <section className="home-section" aria-labelledby="polls-title" id="polls">

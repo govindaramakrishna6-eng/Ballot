@@ -1,8 +1,6 @@
 import { Link } from "react-router";
 import { isLocalChain, targetChain } from "../../config/chains";
-import type { ChainEvents } from "../../hooks/useActivity";
 import { ChainIcon, EyeIcon, LockIcon, VerifyIcon } from "../icons";
-import { BlockRibbon } from "./BlockRibbon";
 
 const TRUST = [
   { icon: <ChainIcon className="icon-xs" />, label: `Built on ${isLocalChain ? "a local chain" : targetChain.name}` },
@@ -11,8 +9,8 @@ const TRUST = [
   { icon: <LockIcon className="icon-xs" />, label: "No admin controls" },
 ];
 
-/** Headline, one line of what you can do, the primary + secondary action, then trust badges and the live chain. */
-export function Hero({ chain }: { chain: ChainEvents | undefined }) {
+/** Headline, one line of what you can do, the primary + secondary action, then trust badges. */
+export function Hero() {
   return (
     <section className="hero" aria-labelledby="hero-title">
       <div className="hero-inner">
@@ -37,7 +35,6 @@ export function Hero({ chain }: { chain: ChainEvents | undefined }) {
             </li>
           ))}
         </ul>
-        <BlockRibbon chain={chain} />
       </div>
     </section>
   );

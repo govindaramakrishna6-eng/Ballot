@@ -49,16 +49,21 @@ test.describe("On-chain experience", () => {
     await expect(page.getByTestId("poll-live-notice")).toContainText(/Block #\d+/);
   });
 
-  test("homepage block ribbon advances with the chain and stamps blocks that carry Ballot events", async ({ page }) => {
+  test("live ticker scrolls right → left, pauses on hover, and shows new blocks and polls", async ({ page }) => {
+    const id = await chain.createPoll({ title: `Ticker poll ${Date.now()}` });
+    await chain.vote(id, 0, 4);
     await page.goto("/");
-    const ribbon = page.getByTestId("block-ribbon");
-    await expect(ribbon.locator(".tile").first()).toBeVisible();
-    const id = await chain.createPoll({ title: "Ribbon block" });
-    const latest = (await page.evaluate(() => fetch("http://127.0.0.1:8545", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_blockNumber", params: [] }) }).then((r) => r.json()))).result;
-    const n = BigInt(latest).toString();
-    await expect(ribbon.locator(`.tile[data-block="${n}"]`)).toHaveClass(/tile-ballot/);
-    await expect(ribbon.locator(".tile").last()).toHaveAttribute("data-block", n);
-    expect(id).toBeGreaterThan(0n);
+    const ticker = page.getByTestId("live-ticker");
+    await expect(ticker.locator(`a[href="/poll/${id}"]`).first()).toBeVisible();
+    await expect(ticker).toContainText(/Block\s*#\d+/);
+    const x = () => page.locator(".tk-track").evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m41);
+    const a = await x();
+    await page.waitForTimeout(600);
+    expect(await x()).toBeLessThan(a); // moving left
+    await ticker.hover();
+    const b = await x();
+    await page.waitForTimeout(600);
+    expect(await x()).toBeCloseTo(b, 0); // paused under the pointer
   });
 
   test("hero shows the four trust badges", async ({ page }) => {

@@ -3,8 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { usePublicClient } from "wagmi";
 import { isLocalChain, targetChain } from "../config/chains";
 
-type Clock = { nowSec: number; synced: boolean; blockNumber: bigint | null };
-const ClockContext = createContext<Clock>({ nowSec: Math.floor(Date.now() / 1000), synced: false, blockNumber: null });
+export type BlockSummary = { number: bigint; txCount: number; timestamp: bigint };
+type Clock = { nowSec: number; synced: boolean; blockNumber: bigint | null; recentBlocks: BlockSummary[] };
+const ClockContext = createContext<Clock>({ nowSec: Math.floor(Date.now() / 1000), synced: false, blockNumber: null, recentBlocks: [] });
+const RECENT_BLOCKS = 6;
 
 /**
  * Poll status must follow CHAIN time, not the user's clock (which may be wrong).
@@ -26,6 +28,8 @@ export function ChainClockProvider({ children }: { children: ReactNode }) {
   const offsetMs = useRef<number | null>(null);
   const [nowMs, setNowMs] = useState(() => Date.now());
   const [synced, setSynced] = useState(false);
+  // The last few blocks we've seen (newest first) — fuel for the live ticker.
+  const [recentBlocks, setRecentBlocks] = useState<BlockSummary[]>([]);
 
   useEffect(() => {
     if (!block) return;
@@ -34,6 +38,8 @@ export function ChainClockProvider({ children }: { children: ReactNode }) {
     offsetMs.current = Math.max(offsetMs.current ?? -Infinity, observed, floor);
     setNowMs(Date.now() + offsetMs.current);
     setSynced(true);
+    const summary = { number: block.number, txCount: block.transactions.length, timestamp: block.timestamp };
+    setRecentBlocks((prev) => (prev[0]?.number === summary.number ? prev : [summary, ...prev].slice(0, RECENT_BLOCKS)));
   }, [block]);
 
   useEffect(() => {
@@ -42,7 +48,7 @@ export function ChainClockProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <ClockContext.Provider value={{ nowSec: Math.floor(nowMs / 1000), synced, blockNumber: block?.number ?? null }}>
+    <ClockContext.Provider value={{ nowSec: Math.floor(nowMs / 1000), synced, blockNumber: block?.number ?? null, recentBlocks }}>
       {children}
     </ClockContext.Provider>
   );

@@ -21,13 +21,36 @@ test.describe("Header navigation", () => {
       const headerBottom = (await page.locator(".site-header").boundingBox())!;
       const title = (await page.locator(".hero-title").boundingBox())!;
       expect(title.y).toBeGreaterThan(headerBottom.y + headerBottom.height);
-      const ribbon = (await page.locator(".ribbon").boundingBox())!;
+      const ribbon = (await page.locator(".trust-chips").boundingBox())!;
       const next = (await page.getByRole("heading", { name: "How it works" }).boundingBox())!;
       expect(next.y).toBeGreaterThan(ribbon.y + ribbon.height);
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(w);
       await expect(page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Results" })).toBeVisible();
     });
   }
+});
+
+test.describe("Results dashboard", () => {
+  test("headline figures, most-voted ranking, votes-over-time chart with a hover tooltip, colour legend", async ({ page }) => {
+    const id = await chain.createPoll({ title: `Dashboard poll ${Date.now()}`, options: ["Red", "Green", "Blue"] });
+    for (const [v, o] of [[4, 0], [5, 1], [6, 1]] as const) await chain.vote(id, o, v);
+    await page.goto("/results?tab=live");
+    const kpis = page.getByTestId("results-kpis");
+    for (const t of ["Votes counted", "Polls decided", "Live right now", "Avg. votes per poll"]) await expect(kpis).toContainText(t);
+    await expect(page.getByTestId("most-voted").locator("a").first()).toBeVisible();
+
+    const chart = page.getByTestId("votes-over-time");
+    await expect(chart).toBeVisible();
+    const box = (await chart.boundingBox())!;
+    await page.mouse.move(box.x + box.width - 20, box.y + box.height / 2);
+    await expect(chart.locator(".chart-tip")).toContainText(/votes total/);
+
+    const card = page.locator(`[data-testid="result-card"][data-poll-id="${id}"]`);
+    await expect(card.locator(".seg-part")).toHaveCount(2); // Blue has no votes → no segment
+    await expect(card.locator(".legend li")).toHaveCount(3);
+    await expect(card.locator(".legend li").nth(1)).toContainText("Green");
+    await expect(card.locator(".legend li").nth(1)).toContainText("2 · 67%");
+  });
 });
 
 test.describe("Results page", () => {

@@ -4,6 +4,7 @@ import { NavLink, Outlet } from "react-router";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { Footer } from "./Footer";
 import { IntroSplash } from "./IntroSplash";
+import { LiveTicker } from "./LiveTicker";
 import { LogoMark } from "./LogoMark";
 import { NetworkBanner } from "./NetworkBanner";
 import { NoWalletHint } from "./NoWalletHint";
@@ -71,6 +72,7 @@ export function Layout() {
             <ConnectButton chainStatus="icon" showBalance={false} accountStatus="address" />
           </div>
         </div>
+        <LiveTicker />
       </header>
       <div className="wrap" ref={banners}>
         <NetworkBanner />

@@ -97,6 +97,10 @@ test.describe("Results page", () => {
     await page.goto("/");
     await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Watch" }).click();
     await expect(page).toHaveURL(/\/watch$/);
+    // The line under "How it works" on the homepage leads here too.
+    await page.goto("/");
+    await page.getByTestId("watch-link").click();
+    await expect(page).toHaveURL(/\/watch$/);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("See how Ballot works in 2 minutes");
     const video = page.getByTestId("explainer-video");
     await expect(video).toHaveAttribute("controls", "");

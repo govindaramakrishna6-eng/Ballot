@@ -662,3 +662,18 @@ Commit made: feat: calmer backdrop, plain receipt/stats boxes, green wallet butt
 - Moved (owner: "taking too much space on the home page"): the video now has its own page, `/watch` ("See how Ballot works
   in 2 minutes"), with a "Watch" item in the header nav. The homepage keeps only a small "Watch the 2-minute video" link next
   to the "How it works" heading. E2E: the nav includes Watch, and /watch plays and pauses the video. 57 passed.
+
+## Intro sound sync + video line (owner's last two asks before pushing)
+
+- Intro sound: the cues are now placed on the logo animation's own clock (`document.getAnimations()`), after waiting for
+  the animation to really start (`anim.ready`). Before, the sound was scheduled when React mounted, and on a busy load the
+  first animation frame could come about 700 ms later, so the "thunk" played ahead of the ballot. The land cue was also
+  corrected from 1420 ms to 1340 ms (the ballot reaches the slot at 400 + 82% × 1150 ms). Measured offset over 5 loads:
+  3–15 ms.
+- Decision (owner chose "keep it automatic" over a click-to-enter gate): browsers block sound until the first gesture, so on
+  most first visits the intro is silent. The old fallback, which played the drop sound on the visitor's first click, was
+  removed, because it could never be in sync and that click skips the intro anyway.
+- Homepage: one centred line under the three "How it works" boxes, "Prefer to watch? There's a 2-minute explainer video in
+  the Watch section. Watch the video →", linking to /watch. The heading-side link was removed to avoid saying it twice.
+- E2E: blocked sound stays silent with no stray sound; in an autoplay-allowed browser the drop sound is within 40 ms of the
+  landing frame; the line links to /watch. Result: 58 passed.

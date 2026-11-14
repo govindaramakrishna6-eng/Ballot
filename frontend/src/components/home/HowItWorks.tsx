@@ -23,16 +23,7 @@ const STEPS = [
 export function HowItWorks() {
   return (
     <section className="home-section" aria-labelledby="how-title" id="how-it-works">
-      <SectionHead
-        id="how-title"
-        kicker="Three steps"
-        title="How it works"
-        action={
-          <Link to="/watch" className="link text-sm" data-testid="watch-link">
-            Watch the 2-minute video
-          </Link>
-        }
-      />
+      <SectionHead id="how-title" kicker="Three steps" title="How it works" />
       <ol className="grid-3">
         {STEPS.map((s, i) => (
           <li key={s.title} className="card step-card">
@@ -47,6 +38,12 @@ export function HowItWorks() {
           </li>
         ))}
       </ol>
+      <p className="how-video-line">
+        Prefer to watch? There's a 2-minute explainer video in the Watch section.{" "}
+        <Link to="/watch" className="link" data-testid="watch-link">
+          Watch the video →
+        </Link>
+      </p>
     </section>
   );
 }

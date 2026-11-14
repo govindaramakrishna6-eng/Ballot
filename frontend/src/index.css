@@ -1216,3 +1216,6 @@ body {
 .explainer-video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: var(--paper-2); }
 .explainer-cap { padding: 0.8rem 1.1rem; border-top: 2px solid var(--edge); color: var(--muted); font-size: 0.95rem; }
 .explainer-cap .mono { color: var(--ink); margin-right: 0.5rem; }
+
+/* One line under the three "How it works" boxes pointing to the video page. */
+.how-video-line { margin-top: 1.4rem; text-align: center; color: var(--muted); }

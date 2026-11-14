@@ -121,23 +121,25 @@ function chime(t: number) {
   tone(t, 659.25, 0.6, { gain: 0.04, type: "triangle" });
 }
 
-/** The intro, timed to the logo animation (ballot appears → ticked → drops in → seal). */
-export function playIntro(): void {
-  if (!soundEnabled() || !audioRunning()) return;
-  const t = ctx!.currentTime + 0.02;
-  slide(t + 0.42);
-  tick(t + 0.72);
-  tick(t + 0.8);
-  thunk(t + 1.42);
-  chime(t + 1.5);
-}
+/** Moments in the logo animation (ms from its start), matching the .lm-* keyframes in index.css. */
+// land = the ballot reaching the slot: lm-ballot starts at 400ms and hits bottom at 82% of 1150ms (≈1343ms).
+export const INTRO_CUES = { slide: 420, tick: 720, tick2: 800, land: 1340, seal: 1420 } as const;
 
-/** For an intro already under way (sound enabled late): just the drop + seal, now. */
-export function playLand(): void {
+/**
+ * The intro sound, locked to the logo animation. `elapsedMs` is how far the animation already is
+ * (the audio engine can take a moment to wake up), so every cue still lands on its frame; cues that
+ * have already passed are skipped rather than played late.
+ */
+export function playIntro(elapsedMs = 0): void {
   if (!soundEnabled() || !audioRunning()) return;
-  const t = ctx!.currentTime + 0.02;
-  thunk(t);
-  chime(t + 0.08);
+  const now = ctx!.currentTime;
+  const at = (cueMs: number) => now + (cueMs - elapsedMs) / 1000;
+  const due = (cueMs: number) => cueMs - elapsedMs >= -30; // up to 30ms late is imperceptible
+  if (due(INTRO_CUES.slide)) slide(Math.max(now, at(INTRO_CUES.slide)));
+  if (due(INTRO_CUES.tick)) tick(Math.max(now, at(INTRO_CUES.tick)));
+  if (due(INTRO_CUES.tick2)) tick(Math.max(now, at(INTRO_CUES.tick2)));
+  if (due(INTRO_CUES.land)) thunk(Math.max(now, at(INTRO_CUES.land)));
+  if (due(INTRO_CUES.seal)) chime(Math.max(now, at(INTRO_CUES.seal)));
 }
 
 /** A vote or poll was recorded on-chain. */

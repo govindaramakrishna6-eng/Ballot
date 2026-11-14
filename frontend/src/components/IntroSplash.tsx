@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useReducedMotion } from "../hooks/useReducedMotion";
-import { playIntro, playLand, soundEnabled, unlockAudio } from "../lib/sound";
+import { playIntro, soundEnabled, unlockAudio } from "../lib/sound";
 import { LogoMark } from "./LogoMark";
 
 const SEEN_KEY = "ballot:intro-seen";
@@ -18,6 +18,20 @@ function alreadySeen(): boolean {
 }
 
 /**
+ * How far the logo animation already is, on the browser's own animation clock. Waits for the animation to
+ * really start first: on a busy page load the first frame can be hundreds of ms after React mounts it,
+ * and scheduling the sound before that would put the "thunk" ahead of the ballot.
+ */
+async function introElapsedMs(): Promise<number> {
+  const anim = document.getAnimations().find((a) => (a as CSSAnimation).animationName === "lm-cube-in");
+  if (!anim) return 0;
+  await anim.ready.catch(() => {});
+  const now = document.timeline.currentTime;
+  if (typeof now !== "number" || typeof anim.startTime !== "number") return 0;
+  return Math.max(0, now - anim.startTime);
+}
+
+/**
  * Brand intro, once per browser session, over the app (which keeps loading underneath, so data is
  * never delayed). Any click, tap or key skips it. Decorative: screen readers go straight to the app.
  */
@@ -28,21 +42,15 @@ export function IntroSplash() {
   useEffect(() => {
     if (phase !== "play" || !soundEnabled()) return;
     let cancelled = false;
-    const start = performance.now();
-    // Browsers block sound until the visitor first clicks/taps/types. If that's the case, there is no
-    // button: the sound simply plays on that first gesture (the "drop + seal" part), as long as it
-    // comes within a few seconds of arriving — never as a surprise much later.
-    const onFirstGesture = () => {
-      void unlockAudio().then((ok) => ok && performance.now() - start < 12_000 && playLand());
-    };
-    void unlockAudio().then((running) => {
-      if (cancelled) return;
-      if (running) playIntro();
-      else {
-        window.addEventListener("pointerdown", onFirstGesture, { once: true });
-        window.addEventListener("keydown", onFirstGesture, { once: true });
-      }
-    });
+    // Browsers block sound until the visitor has interacted with the page, so on most first visits this
+    // stays silent (owner's choice: no click-to-enter gate). When sound is allowed, every cue is placed on
+    // the animation's own clock, so the drop sound lands exactly as the ballot hits the box.
+    void (async () => {
+      const running = await unlockAudio();
+      if (!running || cancelled) return;
+      const elapsed = await introElapsedMs();
+      if (!cancelled) playIntro(elapsed);
+    })();
     return () => {
       cancelled = true;
     };

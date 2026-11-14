@@ -28,6 +28,7 @@ test.describe("Homepage v2", () => {
     // The video lives on its own page; the homepage only links to it.
     await expect(how.getByTestId("explainer-video")).toHaveCount(0);
     await expect(how.getByTestId("watch-link")).toHaveAttribute("href", "/watch");
+    await expect(how.locator(".how-video-line")).toContainText("2-minute explainer video in the Watch section");
 
     const trust = page.getByTestId("trust-points");
     for (const t of ["Votes are recorded on-chain", "Independently verifiable", "Immutable, no admin controls", "You keep custody"]) await expect(trust).toContainText(t);

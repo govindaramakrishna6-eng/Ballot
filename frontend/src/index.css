@@ -1210,8 +1210,9 @@ body {
   .hero-ctas { margin-top: 1.25rem; }
 }
 
-/* Explainer video under "How it works": an ordinary card, the browser's own controls (keyboard + screen reader friendly). */
-.explainer { margin-top: 2rem; padding: 0; overflow: hidden; }
+/* Explainer video on /watch: an ordinary card, the browser's own controls (keyboard + screen reader friendly). */
+.watch-page { max-width: 960px; margin-inline: auto; }
+.explainer { margin-top: 1.5rem; padding: 0; overflow: hidden; }
 .explainer-video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: var(--paper-2); }
 .explainer-cap { padding: 0.8rem 1.1rem; border-top: 2px solid var(--edge); color: var(--muted); font-size: 0.95rem; }
 .explainer-cap .mono { color: var(--ink); margin-right: 0.5rem; }

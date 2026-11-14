@@ -17,6 +17,7 @@ const LINKS = [
   { to: "/results", label: "Results" },
   { to: "/create", label: "Create" },
   { to: "/me", label: "My votes" },
+  { to: "/watch", label: "Watch" },
 ];
 
 const nav = ({ isActive }: { isActive: boolean }) => `nav-link ${isActive ? "nav-link-active" : ""}`;

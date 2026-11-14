@@ -4,7 +4,7 @@ test.describe("Header navigation", () => {
   test("Home and Results links are in the header and go to their pages", async ({ page }) => {
     await page.goto("/polls");
     const nav = page.getByRole("navigation", { name: "Main" });
-    await expect(nav.getByRole("link")).toHaveText(["Home", "Polls", "Results", "Create", "My votes"]);
+    await expect(nav.getByRole("link")).toHaveText(["Home", "Polls", "Results", "Create", "My votes", "Watch"]);
     await nav.getByRole("link", { name: "Home" }).click();
     await expect(page).toHaveURL(/\/$/);
     await expect(nav.getByRole("link", { name: "Home" })).toHaveClass(/nav-link-active/);
@@ -91,5 +91,22 @@ test.describe("Results page", () => {
 
     await card(open).getByRole("link", { name: /Full results/ }).click();
     await expect(page).toHaveURL(new RegExp(`/poll/${open}$`));
+  });
+
+  test("Watch page: titled, with the explainer video that plays and pauses", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Watch" }).click();
+    await expect(page).toHaveURL(/\/watch$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("See how Ballot works in 2 minutes");
+    const video = page.getByTestId("explainer-video");
+    await expect(video).toHaveAttribute("controls", "");
+    await expect(video).toHaveAttribute("preload", "none");
+    const res = await page.request.get("/ballot-explainer.mp4");
+    expect(res.ok()).toBe(true);
+    expect(res.headers()["content-type"]).toContain("video/mp4");
+    await video.evaluate((v: HTMLVideoElement) => { v.muted = true; return v.play(); });
+    await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.currentTime)).toBeGreaterThan(0.2);
+    await video.evaluate((v: HTMLVideoElement) => v.pause());
+    await expect.poll(() => video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
   });
 });

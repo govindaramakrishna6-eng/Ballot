@@ -1,4 +1,5 @@
 import { BallotIcon, VerifyIcon, WalletIcon } from "../icons";
+import { Link } from "react-router";
 import { SectionHead } from "./SectionHead";
 
 const STEPS = [
@@ -22,7 +23,16 @@ const STEPS = [
 export function HowItWorks() {
   return (
     <section className="home-section" aria-labelledby="how-title" id="how-it-works">
-      <SectionHead id="how-title" kicker="Three steps" title="How it works" />
+      <SectionHead
+        id="how-title"
+        kicker="Three steps"
+        title="How it works"
+        action={
+          <Link to="/watch" className="link text-sm" data-testid="watch-link">
+            Watch the 2-minute video
+          </Link>
+        }
+      />
       <ol className="grid-3">
         {STEPS.map((s, i) => (
           <li key={s.title} className="card step-card">
@@ -37,27 +47,6 @@ export function HowItWorks() {
           </li>
         ))}
       </ol>
-      {/* Self-hosted (same origin, so the CSP needs no change). preload="none" keeps the homepage light:
-          the 5 MB file only downloads when someone presses play. Captions are burned into the video. */}
-      <figure className="card explainer" data-testid="explainer">
-        <video
-          className="explainer-video"
-          controls
-          preload="none"
-          playsInline
-          poster="/explainer-poster.jpg"
-          width={1280}
-          height={720}
-          aria-label="Ballot explained in 2 minutes, with narration and on-screen captions"
-          data-testid="explainer-video"
-        >
-          <source src="/ballot-explainer.mp4" type="video/mp4" />
-          Your browser can't play this video.
-        </video>
-        <figcaption className="explainer-cap">
-          <span className="mono">2:00</span> Watch the whole journey: create a poll, vote, get your receipt, and see the result.
-        </figcaption>
-      </figure>
     </section>
   );
 }

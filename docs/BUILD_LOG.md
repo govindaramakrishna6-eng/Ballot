@@ -659,3 +659,6 @@ Commit made: feat: calmer backdrop, plain receipt/stats boxes, green wallet butt
   unprompted is jarring, and the intro already plays sound.
 - E2E (homepage-v2.spec): the video has controls, the file is served as video/mp4, and it actually plays and pauses.
   Result: 56 passed.
+- Moved (owner: "taking too much space on the home page"): the video now has its own page, `/watch` ("See how Ballot works
+  in 2 minutes"), with a "Watch" item in the header nav. The homepage keeps only a small "Watch the 2-minute video" link next
+  to the "How it works" heading. E2E: the nav includes Watch, and /watch plays and pauses the video. 57 passed.

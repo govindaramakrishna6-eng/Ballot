@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useReducedMotion } from "../hooks/useReducedMotion";
+import { playIntro, playLand, soundEnabled, unlockAudio } from "../lib/sound";
 import { LogoMark } from "./LogoMark";
 
 const SEEN_KEY = "ballot:intro-seen";
@@ -23,6 +24,22 @@ function alreadySeen(): boolean {
 export function IntroSplash() {
   const reduce = useReducedMotion();
   const [phase, setPhase] = useState<"play" | "exit" | "done">(() => (alreadySeen() ? "done" : "play"));
+  // Browsers block sound until the visitor interacts; if that happens we offer a small "Tap for sound".
+  const [needsTap, setNeedsTap] = useState(false);
+
+  useEffect(() => {
+    if (phase !== "play" || !soundEnabled()) return;
+    let cancelled = false;
+    void unlockAudio().then((running) => {
+      if (cancelled) return;
+      if (running) playIntro();
+      else setNeedsTap(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once, when the intro starts
+  }, []);
 
   useEffect(() => {
     if (phase !== "play") return;
@@ -59,6 +76,25 @@ export function IntroSplash() {
         <p className="intro-word">Ballot</p>
         <p className="intro-tag">Verifiable, tamper‑proof voting</p>
       </div>
+      {needsTap && phase === "play" && (
+        <button
+          type="button"
+          className="intro-sound"
+          data-testid="intro-sound"
+          // Enables sound without skipping the intro (the backdrop's tap would skip it).
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            void unlockAudio().then((ok) => ok && playLand());
+            setNeedsTap(false);
+          }}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" />
+            <path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" />
+          </svg>
+          Tap for sound
+        </button>
+      )}
       <p className="intro-skip">Tap or press any key to skip</p>
     </div>
   );

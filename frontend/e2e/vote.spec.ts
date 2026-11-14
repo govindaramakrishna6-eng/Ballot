@@ -38,15 +38,20 @@ test.describe("Voting", () => {
     // Mute live updates for this page so it keeps showing the form (as a stale tab would):
     // forward every RPC call but blank out event-filter results.
     await page.route("http://127.0.0.1:8545/**", async (route) => {
-      const sent = JSON.parse(route.request().postData() ?? "null");
-      const response = await route.fetch();
-      const body = await response.json();
-      const calls = Array.isArray(sent) ? sent : [sent];
-      const results = Array.isArray(body) ? body : [body];
-      results.forEach((r, i) => {
-        if (calls[i]?.method === "eth_getFilterChanges" || calls[i]?.method === "eth_getLogs") r.result = [];
-      });
-      await route.fulfill({ response, json: Array.isArray(body) ? results : results[0] });
+      try {
+        const sent = JSON.parse(route.request().postData() ?? "null");
+        const response = await route.fetch();
+        const body = await response.json();
+        const calls = Array.isArray(sent) ? sent : [sent];
+        const results = Array.isArray(body) ? body : [body];
+        results.forEach((r, i) => {
+          if (calls[i]?.method === "eth_getFilterChanges" || calls[i]?.method === "eth_getLogs") r.result = [];
+        });
+        await route.fulfill({ response, json: Array.isArray(body) ? results : results[0] });
+      } catch {
+        // The page moved on while this request was in flight (rare race): let it through untouched.
+        await route.continue().catch(() => {});
+      }
     });
 
     // The same wallet votes from another tab/device.

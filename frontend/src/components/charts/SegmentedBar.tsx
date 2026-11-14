@@ -1,7 +1,7 @@
 import type { ResultRow } from "../../lib/results";
 
 /** Colour follows the option (its index), never its rank, so a reorder never repaints an option. */
-export const SERIES_SLOTS = 6;
+export const SERIES_SLOTS = 5; // validated set; a 6th+ option shares the neutral "other" swatch
 export function seriesVar(index: number) {
   return index < SERIES_SLOTS ? `var(--series-${index + 1})` : "var(--series-other)";
 }

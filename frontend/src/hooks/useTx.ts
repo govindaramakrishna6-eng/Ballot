@@ -8,6 +8,7 @@ import { deployment, votingAbi } from "../contract/contract";
 import { useAnnounce } from "./useAnnouncer";
 import { describeError, revertSentence, type DescribedError } from "../lib/errors";
 import { clearPending, loadPending, savePending } from "../lib/pendingTx";
+import { playRecorded } from "../lib/sound";
 
 /** Every write in the app is one of these — typed against the ABI. */
 export type TxRequest =
@@ -74,6 +75,7 @@ export function useTx({ action, noun, pendingMessage, confirmedMessage, onConfir
         if (receipt.status === "success") {
           setState({ status: "confirmed", hash: pendingHash, receipt });
           announce(messagesRef.current.confirmedMessage);
+          playRecorded(); // the same "dropped in + sealed" sound as the intro (silent if muted)
           onConfirmedRef.current?.(receipt);
         } else {
           const error = await explainMinedRevert(pendingHash, receipt);

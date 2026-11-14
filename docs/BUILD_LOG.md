@@ -578,3 +578,23 @@ Files created/changed (paths): frontend/src/index.css, CLAUDE.md, docs/screensho
 Test/build results (actually observed): vitest 38 passed; tsc OK; oxlint 0 new; E2E 51 passed (1.6m); no sideways scroll at 375/390 px.
 Commit made: style(hero): ballot-grid texture and soft glow on a near-black band; drop the graph-paper grid
 ```
+
+---
+
+## Backdrop, green everywhere, intro sound (owner feedback; dark-band and orange iterations discarded)
+
+### Decisions
+- **Dark hero band removed** (owner: not what was meant). The page is cream again, with a faint site-wide **"ballot sheet" texture** — scattered tick-boxes (some ticked, some empty) and dots, ink at ~11% on the strokes — instead of the graph grid. Inline SVG, no requests.
+- **The logo's green replaces every orange accent** (an intermediate "orange everywhere" pass was reverted at the owner's request): primary buttons `#1D7F5C` with cream text (4.6:1), live dots, "Open", verified/seal, focus ring; dark mode mint `#A8E6CF` with ink text. Logo/favicon/touch icon keep the green. Red remains only for errors/failed.
+- **Charts without orange**: green, sky, butter, lilac, pink (validated light + dark, all checks pass); options beyond 5 share a neutral swatch.
+- **Intro sound** synthesised with Web Audio (no files, CSP-safe): paper slide as the ballot appears, two pen ticks, a soft wooden thunk as it drops into the box, a two-note chime at the seal. The same thunk + chime plays when a vote/poll is recorded. Browsers block audio before any interaction, so when autoplay is blocked the intro shows "Tap for sound" (enables sound and plays the drop + chime without skipping); `resume()` is raced with a 200 ms timeout because Chrome leaves it pending instead of rejecting. Footer "Sound: On/Off" remembered in localStorage. Verified by counting scheduled sound sources: blocked → 0 before tap, >0 after; autoplay allowed → full sequence; muted → 0.
+- Hardened the double-vote E2E interceptor against a rare route race (25/25 on repeat before the fix).
+
+```
+STATUS REPORT
+Done: ballot-sheet backdrop; green accent across the app (icon-matched); orange removed from UI and charts; intro + recorded sounds with tap-for-sound and mute.
+Files created/changed (paths): frontend/src/index.css, lib/sound.ts, hooks/useSound.ts, components/{IntroSplash,Footer}.tsx,
+  hooks/useTx.ts, main.tsx, components/charts/SegmentedBar.tsx, public/{favicon.svg,apple-touch-icon.png}, e2e/{intro,vote}.spec.ts, CLAUDE.md
+Test/build results (actually observed): vitest 38 passed; tsc OK; oxlint 0 new; E2E 53 passed (1.7m); chart palette validator PASS light + dark.
+Commit made: feat: ballot-sheet backdrop, the logo's green across the app, and an intro sound
+```

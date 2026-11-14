@@ -48,4 +48,36 @@ test.describe("Brand intro", () => {
     expect(res.ok()).toBe(true);
     expect(await res.text()).toContain("<svg");
   });
+
+  test("sound: browsers block autoplay → 'Tap for sound' turns it on without skipping the intro", async ({ page }) => {
+    await page.addInitScript(() => {
+      // count every sound source the page starts
+      (window as never as { __snd: number }).__snd = 0;
+      const osc = AudioContext.prototype.createOscillator;
+      AudioContext.prototype.createOscillator = function () {
+        (window as never as { __snd: number }).__snd++;
+        return osc.call(this);
+      };
+    });
+    await page.goto("/");
+    const intro = page.getByTestId("intro");
+    const tap = page.getByTestId("intro-sound");
+    await expect(tap).toBeVisible();
+    expect(await page.evaluate(() => (window as never as { __snd: number }).__snd)).toBe(0); // silent until a gesture
+    await tap.click();
+    await expect(intro).toBeVisible(); // tapping for sound does not skip
+    await expect.poll(() => page.evaluate(() => (window as never as { __snd: number }).__snd)).toBeGreaterThan(0);
+  });
+
+  test("sound can be switched off in the footer and the choice is remembered", async ({ page }) => {
+    await page.addInitScript(() => sessionStorage.setItem("ballot:intro-seen", "1"));
+    await page.goto("/");
+    const toggle = page.getByTestId("sound-toggle");
+    await expect(toggle).toHaveText("Sound: On");
+    await toggle.click();
+    await expect(toggle).toHaveText("Sound: Off");
+    await expect(toggle).toHaveAttribute("aria-pressed", "false");
+    await page.reload();
+    await expect(page.getByTestId("sound-toggle")).toHaveText("Sound: Off");
+  });
 });

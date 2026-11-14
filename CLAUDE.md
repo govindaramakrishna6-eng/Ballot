@@ -238,9 +238,11 @@ The feel: a modern polling station. Paper, ink, stamps, receipts. Calm, trustwor
   dot in the ticker), the verified/success state, and meaningful status (green open, amber closing soon,
   red failed/closed). Cards, tags, ticker, hashes, icons, kickers, FAQ and footer stay white/gray/black.
   Categorical colour remains only where it identifies data (results part-to-whole bars).
-- Backdrop (owner feedback): no graph-paper grid. The homepage hero is a full-width near-black band
-  (`#07070B`) with a faint grid of ballot shapes (white ~6%, fading to the edges) and one soft violet/blue
-  radial glow behind the headline. Never chart-like visuals (candles, lines, bars) as decoration.
+- Backdrop (owner feedback): a faint site-wide "ballot sheet" texture — scattered tick-boxes, some ticked,
+  at the same low contrast the old grid had. Never chart-like visuals as decoration.
+- Accent (owner feedback): the logo's green everywhere, no orange. Primary buttons, live dots, "Open",
+  verified/success and focus use `#1D7F5C` (cream text on it, 4.6:1); dark mode `#A8E6CF` (ink text).
+  Red stays only for errors/failed. Charts use green as the first data colour.
 - Type: Fraunces for headings, Figtree for body, JetBrains Mono for hashes/addresses/numbers.
   Tabular numerals for vote counts.
 - Motifs: perforated/dashed edges on the ballot receipt, a subtle stamp animation when a vote

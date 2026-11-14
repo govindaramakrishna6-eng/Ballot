@@ -4,6 +4,8 @@ import { env } from "../config/env";
 import { deployment } from "../contract/contract";
 import { useChainClock } from "../hooks/useChainClock";
 import { LogoMark } from "./LogoMark";
+import { useSoundSetting } from "../hooks/useSound";
+import { unlockAudio } from "../lib/sound";
 
 /**
  * Brand + transparency statement (left third), then "Product" and "Verify" link columns.
@@ -16,6 +18,7 @@ export function Footer() {
   const contractUrl = deployment ? explorerAddressUrl(deployment.address) : null;
   const sourcify = deployment && !isLocalChain ? `https://sourcify.dev/server/repo-ui/${targetChain.id}/${deployment.address}` : null;
   const source = env.sourceUrl ?? sourcify;
+  const [soundOn, setSoundOn] = useSoundSetting();
   const ext = (href: string) => (href.startsWith("http") ? { target: "_blank", rel: "noreferrer" } : {});
 
   return (
@@ -64,6 +67,18 @@ export function Footer() {
             </a>
           )}
           <a href="/#security">How results are secured</a>
+          <button
+            type="button"
+            className="sound-toggle"
+            aria-pressed={soundOn}
+            data-testid="sound-toggle"
+            onClick={() => {
+              setSoundOn(!soundOn);
+              void unlockAudio();
+            }}
+          >
+            Sound: {soundOn ? "On" : "Off"}
+          </button>
           <p className="network-status mono" data-testid="network-indicator">
             <span className="pulse-dot" aria-hidden="true" />
             <span>

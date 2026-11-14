@@ -16,7 +16,7 @@
   --line: #E2D9C8;           /* hairline dividers */
   --edge: #1D2B2A;           /* thick outlines */
   --shadow-color: #1D2B2A;   /* solid offset shadows */
-  --accent: #1D7F5C;         /* mint deep: kickers, live dots, success text */
+  --accent: #1D7F5C;         /* the logo's green: live dots, verified/success, "Open", primary buttons */
   --mint: #A8E6CF;
   --tomato: #FF6B4A;
   --tomato-soft: #FFD9CF;
@@ -31,7 +31,7 @@
   --warn: #7A5300;
   --focus: #E05E41;
   --grid: rgb(29 43 42 / .05);
-  --primary: var(--tomato);
+  --primary: var(--accent);
   --on-primary: var(--sticker-ink);
   --chart: var(--accent);
   --serif: "Fraunces Variable", Georgia, serif;
@@ -777,16 +777,16 @@ a.tk-item:hover, a.tk-item:focus-visible { background: color-mix(in srgb, var(--
    (light: all checks pass, contrast relief via direct labels; dark: all pass).
    ===================================================================== */
 :root {
-  /* Field Guide hues at chart-safe steps; order validated (dataviz validator) on the card surface,
-     light #FFFDF8 and dark #1E2D2B: all checks pass (light contrast relief = labelled legends). */
-  --series-1: #FF6B4A; --series-2: #2E86C8; --series-3: #E3A300;
-  --series-4: #1D7F5C; --series-5: #8A6CF0; --series-6: #E8689A;
+  /* Field Guide hues, the logo's green first, no orange; order validated (dataviz validator) on the card
+     surface, light #FFFDF8 and dark #1E2D2B: all checks pass (light contrast relief = labelled legends). */
+  --series-1: #1D7F5C; --series-2: #2E86C8; --series-3: #E3A300;
+  --series-4: #8A6CF0; --series-5: #E8689A;
   --series-other: #A59E92;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --series-1: #E25A3B; --series-2: #3E95D6; --series-3: #C08A00;
-    --series-4: #2E9E74; --series-5: #8770E6; --series-6: #D0507F;
+    --series-1: #2E9E74; --series-2: #3E95D6; --series-3: #C08A00;
+    --series-4: #8770E6; --series-5: #D0507F;
     --series-other: #6B7775;
   }
 }
@@ -1080,56 +1080,40 @@ a.tk-item:hover, a.tk-item:focus-visible { background: color-mix(in srgb, var(--
 .footer-h { color: var(--ink); }
 .network-status .pulse-dot { background: var(--faint); animation: none; }
 
+/* =====================================================================
+   Backdrop (owner feedback): instead of a graph grid, a faint "ballot sheet" —
+   scattered tick-boxes (some ticked, some empty) across the whole page, at the
+   same low contrast the grid had. It says "voting", not "spreadsheet".
+   ===================================================================== */
+body {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120' fill='none' stroke='rgba(29%2C43%2C42%2C0.11)' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='14' y='14' width='11' height='11' rx='2'/%3E%3Cpath d='M16.8 19.6l2.2 2.2 4.2-4.6'/%3E%3Crect x='74' y='38' width='11' height='11' rx='2'/%3E%3Crect x='34' y='78' width='11' height='11' rx='2'/%3E%3Cpath d='M36.8 83.6l2.2 2.2 4.2-4.6'/%3E%3Crect x='92' y='96' width='11' height='11' rx='2'/%3E%3Cpath d='M94.8 101.6l2.2 2.2 4.2-4.6'/%3E%3Ccircle cx='58' cy='20' r='1'/%3E%3Ccircle cx='104' cy='66' r='1'/%3E%3Ccircle cx='14' cy='58' r='1'/%3E%3Ccircle cx='70' cy='104' r='1'/%3E%3C/svg%3E");
+  background-size: 120px 120px;
+  background-attachment: fixed;
+  background-blend-mode: normal;
+}
+@media (prefers-color-scheme: dark) {
+  body { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120' fill='none' stroke='rgba(244%2C239%2C228%2C0.07)' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='14' y='14' width='11' height='11' rx='2'/%3E%3Cpath d='M16.8 19.6l2.2 2.2 4.2-4.6'/%3E%3Crect x='74' y='38' width='11' height='11' rx='2'/%3E%3Crect x='34' y='78' width='11' height='11' rx='2'/%3E%3Cpath d='M36.8 83.6l2.2 2.2 4.2-4.6'/%3E%3Crect x='92' y='96' width='11' height='11' rx='2'/%3E%3Cpath d='M94.8 101.6l2.2 2.2 4.2-4.6'/%3E%3Ccircle cx='58' cy='20' r='1'/%3E%3Ccircle cx='104' cy='66' r='1'/%3E%3Ccircle cx='14' cy='58' r='1'/%3E%3Ccircle cx='70' cy='104' r='1'/%3E%3C/svg%3E"); }
+}
+
+/* Intro "Tap for sound" + footer toggle */
+.intro-sound {
+  position: absolute; top: 1.25rem; right: 1.25rem; display: inline-flex; align-items: center; gap: .45rem;
+  font: 600 .78rem/1 var(--sans); padding: .55rem .8rem; border-radius: 999px;
+  background: var(--card); color: var(--ink); border: 1.5px solid var(--edge); cursor: pointer;
+}
+.intro-sound svg { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+@media (prefers-reduced-motion: no-preference) { .intro-sound { animation: lm-rise 350ms ease-out 300ms both; } }
+.sound-toggle { width: fit-content; font-size: .92rem; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line); }
+.sound-toggle:hover { color: var(--ink); }
 
 /* =====================================================================
-   Hero backdrop (owner feedback): no graph-paper grid. The hero is a
-   near-black band with a faint grid of ballot shapes (~5%) and one soft
-   violet/blue glow behind the headline — trust and verification, not charts.
+   Green, consistently (owner feedback): the logo's green replaces every
+   orange accent, so the whole app matches the icon. Fills/buttons #1D7F5C
+   with cream text (4.6:1); dark mode uses mint #A8E6CF with ink text.
    ===================================================================== */
-body { background-image: none; overflow-x: clip; }
-
-.hero {
-  position: relative;
-  isolation: isolate;
-  /* full-bleed band, pulled up under main's top padding so it meets the ticker */
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  margin-top: -1.5rem;
-  min-height: calc(100svh - var(--chrome) + 1.5rem - var(--peek));
-  padding-top: 3.5rem;
-  overflow: clip; /* the glow is wider than a phone screen — never let it cause sideways scroll */
-  background: #07070B;
-  color: #F2F0EA;
-}
-.hero::before {
-  /* the ballot grid: evenly spaced, white at ~5%, fading out toward the edges */
-  content: "";
-  position: absolute; inset: 0; z-index: -1;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='8' width='18' height='22' rx='2.5'/%3E%3Cpath d='M13.5 19.5l3.2 3.2 5.8-6.4'/%3E%3Crect x='45' y='44' width='18' height='22' rx='2.5'/%3E%3Cpath d='M49.5 52h9M49.5 57h6'/%3E%3C/svg%3E");
-  background-size: 72px 72px;
-  background-position: center;
-  opacity: .06;
-  -webkit-mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, #000 35%, transparent 100%);
-          mask-image: radial-gradient(ellipse 75% 70% at 50% 45%, #000 35%, transparent 100%);
-}
-.hero::after {
-  /* one restrained violet/blue glow behind the headline */
-  content: "";
-  position: absolute; z-index: -1; pointer-events: none;
-  left: 50%; top: 44%; width: min(980px, 110vw); height: 560px;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(closest-side, rgb(124 108 255 / .30), rgb(64 120 255 / .12) 55%, transparent 100%);
-  filter: blur(8px);
-}
-.hero-title { color: #F7F5F0; }
-.hero-sub { color: #A9AEC0; }
-.hero .btn-secondary { background: transparent; color: #F2F0EA; border-color: rgb(242 240 234 / .55); box-shadow: none; }
-.hero .btn-secondary:hover:not(:disabled) { background: rgb(242 240 234 / .08); color: #F2F0EA; transform: none; box-shadow: none; }
-.hero .btn-primary { border-color: #07070B; box-shadow: 0 0 0 1px rgb(255 107 74 / .35), 0 10px 30px -12px rgb(255 107 74 / .55); }
-.hero .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 0 0 1px rgb(255 107 74 / .45), 0 14px 34px -12px rgb(255 107 74 / .65); }
-.hero .btn-primary:active:not(:disabled) { transform: translateY(1px); }
-.hero .trust-chip { color: #A9AEC0; border-color: rgb(242 240 234 / .16); background: rgb(255 255 255 / .02); }
-.hero .trust-chip svg { stroke: #A9AEC0; }
-.hero :focus-visible { outline-color: #FF8A70; }
-/* the band meets the ticker directly */
-.ticker { border-bottom: 0; }
+:root { --primary: #1D7F5C; --on-primary: #FFFDF8; --focus: #1D7F5C; }
+@media (prefers-color-scheme: dark) { :root { --primary: #A8E6CF; --on-primary: #1D2B2A; --focus: #A8E6CF; } }
+.btn-primary:hover:not(:disabled) { background: #186C4E; border-color: var(--edge); color: var(--on-primary); }
+@media (prefers-color-scheme: dark) { .btn-primary:hover:not(:disabled) { background: #C3EEDD; } }
+.tk-live .pulse-dot, .live-badge .pulse-dot { background: var(--ok); }
+.ranked-fill { background: var(--ink); }

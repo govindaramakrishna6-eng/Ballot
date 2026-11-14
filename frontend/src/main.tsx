@@ -20,6 +20,7 @@ import { envProblems } from "./config/env";
 import { wagmiConfig } from "./config/wagmi";
 import { deployment } from "./contract/contract";
 import { AnnouncerProvider } from "./hooks/useAnnouncer";
+import { installAudioUnlock } from "./lib/sound";
 import { ChainClockProvider } from "./hooks/useChainClock";
 import { LiveUpdatesProvider } from "./hooks/useLiveUpdates";
 
@@ -55,6 +56,8 @@ const walletTheme = {
 
 // RainbowKit's default avatar is an emoji; ours is the same identicon used everywhere else in the app.
 const WalletAvatar: AvatarComponent = ({ address, size }) => <Identicon address={address} size={size} />;
+
+installAudioUnlock();
 
 const root = createRoot(document.getElementById("root")!);
 

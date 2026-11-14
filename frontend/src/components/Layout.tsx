@@ -3,6 +3,8 @@ import { useLayoutEffect, useRef } from "react";
 import { NavLink, Outlet } from "react-router";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { Footer } from "./Footer";
+import { IntroSplash } from "./IntroSplash";
+import { LogoMark } from "./LogoMark";
 import { NetworkBanner } from "./NetworkBanner";
 import { NoWalletHint } from "./NoWalletHint";
 import { Toaster } from "./Toaster";
@@ -54,8 +56,9 @@ export function Layout() {
       </a>
       <header className="site-header" ref={header}>
         <div className="wrap header-grid">
-          <NavLink to="/" className="brand" end>
-            Ballot
+          <NavLink to="/" className="brand brand-lockup" end aria-label="Ballot — home">
+            <LogoMark size={34} />
+            <span>Ballot</span>
           </NavLink>
           <nav aria-label="Main" className="main-nav">
             {LINKS.map((l) => (
@@ -80,6 +83,7 @@ export function Layout() {
       </main>
       <Footer />
       <Toaster />
+      <IntroSplash />
     </div>
   );
 }

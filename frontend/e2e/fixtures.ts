@@ -63,7 +63,18 @@ type WalletControls = {
   disconnect: () => Promise<void>;
 };
 
-export const test = base.extend<{ wallet: WalletControls }>({
+export const test = base.extend<{ wallet: WalletControls; skipIntro: void }>({
+  // Every test starts with the brand intro already "seen" this session, so it never covers the page.
+  // e2e/intro.spec.ts opts out of this to test the intro itself.
+  skipIntro: [
+    async ({ page }, provide, testInfo) => {
+      if (!testInfo.file.endsWith("intro.spec.ts")) {
+        await page.addInitScript(() => sessionStorage.setItem("ballot:intro-seen", "1"));
+      }
+      await provide();
+    },
+    { auto: true },
+  ],
   wallet: async ({ page }, provide) => {
     await provide({
       install: async ({ as = 1, chainId = 31337 } = {}) => {

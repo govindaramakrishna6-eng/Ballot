@@ -478,3 +478,25 @@ Test/build results (actually observed): vitest 35 passed; E2E 46 passed (1.4m); 
 Not done / known issues: the warning itself can only be cleared by the owner (custom domain and/or false-positive reports).
 Commit made: security: CSP and permissions headers, stop bundling host env, wallet-connection security review
 ```
+
+---
+
+## Logo + brand intro
+
+### Decisions
+- **Mark = a ticked ballot standing in the slot of an isometric block** — "your vote goes into the blockchain" in one image. Block faces: top paper, left ink, right ballot-green; ballot paper with a green tick. Built as an inline SVG (`LogoMark`) using the theme tokens, so it follows dark mode; the ballot is skewed to the block's isometric angle and clipped at the slot so it reads as inserted.
+- **Checked at 16 / 32 / 64 / 200 px** on light and dark; the favicon sits on its own paper tile so it stays visible on dark browser tabs. Added `apple-touch-icon.png` (180 px), page title/description and light/dark `theme-color`.
+- **Intro (~2.3 s)** acts the mark out: block settles → blank ballot appears → ticked → drops into the slot → two seal rings pulse and the green face flashes → wordmark + tagline → fade into the app. Frames verified by pausing the animations at fixed times (`docs/screenshots/intro-frames-*.png`).
+- **Intro rules**: once per browser session (sessionStorage), any click/tap/key skips it, the app loads underneath (never delays data), decorative (`aria-hidden`), reduced motion → a still logo for 0.7 s. E2E fixtures mark the intro as seen so it never covers other tests; `e2e/intro.spec.ts` tests it directly.
+- Header and footer now use the mark + wordmark lockup.
+
+```
+STATUS REPORT
+Done: logo mark, favicon + touch icon, header/footer lockup, brand intro animation.
+Files created/changed (paths): frontend/src/components/{LogoMark,IntroSplash,Layout,Footer}.tsx, frontend/src/index.css,
+  frontend/public/{favicon.svg,apple-touch-icon.png}, frontend/index.html, frontend/e2e/{fixtures,intro.spec}.ts,
+  docs/screenshots/intro-frames-{light,dark}.png
+How to run or verify: open the site in a new tab (or clear sessionStorage) to see the intro; npm run e2e
+Test/build results (actually observed): vitest 35 passed; tsc OK; oxlint 0 new; build OK; E2E 50 passed (1.6m).
+Commit made: feat(brand): logo mark, favicon and a once-per-session intro animation
+```

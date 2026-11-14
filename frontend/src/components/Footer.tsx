@@ -3,6 +3,7 @@ import { explorerAddressUrl, isLocalChain, targetChain } from "../config/chains"
 import { env } from "../config/env";
 import { deployment } from "../contract/contract";
 import { useChainClock } from "../hooks/useChainClock";
+import { LogoMark } from "./LogoMark";
 
 /**
  * Brand + transparency statement (left third), then "Product" and "Verify" link columns.
@@ -21,8 +22,9 @@ export function Footer() {
     <footer className="site-footer">
       <div className="wrap footer-grid">
         <div className="footer-brand">
-          <Link to="/" className="brand">
-            Ballot
+          <Link to="/" className="brand brand-lockup" aria-label="Ballot — home">
+            <LogoMark size={28} />
+            <span>Ballot</span>
           </Link>
           <p className="card-body mt-2">
             Every poll and vote lives in a public, immutable smart contract. We can't change results — and you never have to take our

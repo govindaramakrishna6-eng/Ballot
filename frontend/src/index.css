@@ -663,3 +663,60 @@ input[type="datetime-local"].input { width: auto; }
   .trust-chip { padding: .35rem .6rem; font-size: .75rem; }
   .ribbon { margin-top: 1.5rem; }
 }
+
+/* =====================================================================
+   Logo mark + intro
+   ===================================================================== */
+.brand-lockup { display: inline-flex; align-items: center; gap: .55rem; }
+.logo-mark { flex: none; overflow: visible; }
+.logo-mark .lm-face-top { fill: var(--paper-2); stroke: var(--ink); stroke-width: 3; stroke-linejoin: round; }
+.logo-mark .lm-face-left { fill: var(--ink); stroke: var(--ink); stroke-width: 3; stroke-linejoin: round; }
+.logo-mark .lm-face-right { fill: var(--accent); stroke: var(--ink); stroke-width: 3; stroke-linejoin: round; }
+.logo-mark .lm-slot { stroke: var(--ink); stroke-width: 3.2; stroke-linecap: round; fill: none; }
+.logo-mark .lm-paper { fill: var(--paper); stroke: var(--ink); stroke-width: 2.8; }
+.logo-mark .lm-tick { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.logo-mark .lm-ring { fill: none; stroke: var(--accent); stroke-width: 1.5; opacity: 0; }
+
+/* Intro overlay */
+.intro {
+  position: fixed; inset: 0; z-index: 100; display: grid; place-items: center;
+  background: var(--paper);
+  cursor: pointer;
+}
+.intro-stage { display: flex; flex-direction: column; align-items: center; gap: .35rem; }
+.intro-word { font-family: var(--serif); font-weight: 700; font-variation-settings: "opsz" 23; font-size: 2.6rem; letter-spacing: -0.01em; margin-top: 1rem; }
+.intro-tag { font: 600 .72rem/1.3 var(--mono); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+.intro-skip { position: absolute; bottom: 1.75rem; left: 0; right: 0; text-align: center; font: .72rem var(--mono); color: var(--muted); letter-spacing: .08em; }
+.intro-exit { animation: intro-out 450ms cubic-bezier(.6, 0, .4, 1) forwards; pointer-events: none; }
+.intro-still.intro-exit { animation-duration: 150ms; }
+@keyframes intro-out { to { opacity: 0; transform: translateY(-2%) scale(1.02); } }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* 0–450ms: the block settles in */
+  .lm-animated .lm-cube { transform-box: view-box; transform-origin: 32px 41px; animation: lm-cube-in 450ms cubic-bezier(.2, .8, .2, 1) both; }
+  /* 400–650ms: a blank ballot appears above the slot */
+  .lm-animated .lm-ballot { animation: lm-ballot 1150ms cubic-bezier(.2, .8, .2, 1) 400ms both; }
+  /* 700–950ms: it gets ticked */
+  .lm-animated .lm-tick { stroke-dasharray: 16; stroke-dashoffset: 16; animation: lm-draw 280ms ease-out 700ms forwards; }
+  /* ~1450ms: lands in the block → two rings pulse out (the "recorded" seal) */
+  .lm-animated .lm-ring { transform-box: fill-box; transform-origin: center; animation: lm-ring 800ms ease-out 1450ms forwards; }
+  .lm-animated .lm-ring-2 { animation-delay: 1600ms; }
+  .lm-animated .lm-face-right { animation: lm-flash 500ms ease-out 1420ms; }
+  /* 1500–1900ms: wordmark and tagline */
+  .intro:not(.intro-still) .intro-word { animation: lm-rise 450ms cubic-bezier(.2, .8, .2, 1) 1500ms both; }
+  .intro:not(.intro-still) .intro-tag { animation: lm-rise 450ms cubic-bezier(.2, .8, .2, 1) 1650ms both; }
+  .intro:not(.intro-still) .intro-skip { animation: lm-rise 400ms ease-out 600ms both; }
+}
+@keyframes lm-cube-in { from { opacity: 0; transform: translateY(10px) scale(.85); } to { opacity: 1; transform: none; } }
+/* ballot: appear high (−26) → hold while ticked → drop into the slot with a small settle */
+@keyframes lm-ballot {
+  0% { opacity: 0; transform: translateY(-34px); }
+  20% { opacity: 1; transform: translateY(-26px); }
+  52% { transform: translateY(-26px); animation-timing-function: cubic-bezier(.55, 0, .9, .6); }
+  82% { transform: translateY(2px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes lm-draw { to { stroke-dashoffset: 0; } }
+@keyframes lm-ring { 0% { opacity: .7; transform: scale(.85); } 100% { opacity: 0; transform: scale(1.5); } }
+@keyframes lm-flash { 50% { fill: color-mix(in srgb, var(--accent) 70%, var(--paper)); } }
+@keyframes lm-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }

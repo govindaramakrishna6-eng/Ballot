@@ -228,12 +228,14 @@ Read `/design-refs` before any UI work and tell me what you took from each scree
 Take patterns, never copy a brand's logo, colours or name.
 
 The feel: a modern polling station. Paper, ink, stamps, receipts. Calm, trustworthy, legible.
-- Palette: warm off-white paper background, near-black ink text, one accent colour used
-  sparingly for "stamped" moments (a deep ballot green or vermilion — propose one).
-  Proper dark mode: dark paper, light ink, same accent.
-- Type: a characterful display serif for poll titles (e.g. Fraunces or Instrument Serif),
-  a clean sans for UI (e.g. IBM Plex Sans), a monospace for hashes/addresses/numbers
-  (e.g. IBM Plex Mono). Tabular numerals for vote counts.
+- Palette (owner's choice, Nov 2026): the "Web3 Field Guide" palette — cream paper `#FAF6EE` with a
+  faint graph-paper grid, paper-2 `#F2ECDF`, cards `#FFFDF8`, green-black ink `#1D2B2A` (soft `#4B5A58`,
+  faint `#8A9593` decorative only), thick ink outlines + solid offset shadows, and bright sticker accents
+  used sparingly: mint `#A8E6CF` / mint-deep `#1D7F5C`, tomato `#FF6B4A` (main buttons) / tomato-soft
+  `#FFD9CF`, butter `#FFD66B` / butter-soft `#FFF1C7`, lilac `#C8B6FF`, sky `#9ED3F0`; status ok `#1D7F5C`,
+  bad `#D9432A`. Text-only AA steps: danger `#B43722`, focus ring `#E05E41`. Dark mode is derived and AA-checked.
+- Type: Fraunces for headings, Figtree for body, JetBrains Mono for hashes/addresses/numbers.
+  Tabular numerals for vote counts.
 - Motifs: perforated/dashed edges on the ballot receipt, a subtle stamp animation when a vote
   confirms, results as thick ink bars, status as small printed labels.
 - Motion: short and purposeful; respect `prefers-reduced-motion`.

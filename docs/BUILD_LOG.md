@@ -519,3 +519,24 @@ Files created/changed (paths): frontend/src/components/{LiveTicker,ResultCard,La
 Test/build results (actually observed): vitest 38 passed; tsc OK; oxlint 0 new; E2E 51 passed (1.7m).
 Commit made: feat(frontend): live market-tape ticker and a charted results dashboard
 ```
+
+---
+
+## Palette: "Web3 Field Guide" (owner's choice)
+
+### Decisions
+- **Owner supplied the palette** (cream paper + graph grid, green-black ink, thick ink outlines + solid offset shadows, sticker accents mint/tomato/butter/lilac/sky, Fraunces + Figtree + JetBrains Mono). The earlier options A–D and the dark "Web3 Midnight" idea were dropped unapplied. CLAUDE.md §7 updated.
+- **Exact hexes everywhere they're used as fills/borders/badges.** Three uses failed WCAG as written and get deeper text-only steps: error text `#B43722` (bad `#D9432A` is 4.07:1), focus ring `#E05E41` (tomato is 2.61:1 vs 3:1 needed), faint ink kept to decorative uses (2.86:1).
+- **Role mapping**: tomato = main buttons; mint = "Connect Wallet" (RainbowKit accent) and Open labels, vote option selected, journey steps; butter = hero highlighter stroke, Winner labels, closing-soon badges, activity sticky notes, receipt; lilac = step numbers, poll tags; sky = info notices, block tags; tomato-soft = warnings/errors/no-wallet note; ink = the stats strip. Text on any sticker is always ink (≥5.2:1).
+- **Chart colours from the palette's hues** at validated steps — order tomato, sky, butter, mint, lilac, pink; light (card `#FFFDF8`) and dark (card `#1E2D2B`) both pass every validator check (pink/lilac swapped after the first dark run failed deutan separation).
+- **Dark mode derived** (the guide is light-only): dark green-black paper, cream ink, same stickers with ink text; AA-checked.
+
+```
+STATUS REPORT
+Done: Field Guide palette across the app (tokens, cards, buttons, labels, notices, ticker, charts, logo, favicon, wallet button, fonts).
+Files created/changed (paths): frontend/src/index.css, main.tsx, components/home/Hero.tsx, index.html, public/{favicon.svg,
+  apple-touch-icon.png}, package.json (fonts), CLAUDE.md, README.md, docs/screenshots/*
+Test/build results (actually observed): vitest 38 passed; tsc OK; oxlint 0 new; E2E 51 passed (1.5m); all text pairs AA;
+  chart palette validator: PASS light + dark.
+Commit made: feat(design): apply the Web3 Field Guide palette across the app
+```

@@ -14,9 +14,9 @@ export function Hero() {
   return (
     <section className="hero" aria-labelledby="hero-title">
       <div className="hero-inner">
-        {/* U+2011 non-breaking hyphen keeps "tamper‑proof" on one line */}
+        {/* U+2011 non-breaking hyphen keeps "tamper‑proof" on one line; .hl is the butter highlighter stroke */}
         <h1 id="hero-title" className="hero-title">
-          Verifiable, tamper‑proof voting
+          Verifiable, <span className="hl">tamper‑proof</span> voting
         </h1>
         <p className="hero-sub">Create polls, vote with your wallet, and see transparent on-chain results.</p>
         <div className="hero-ctas">

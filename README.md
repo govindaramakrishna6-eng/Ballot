@@ -165,10 +165,10 @@ already contains the rewrite that makes deep links like `/poll/3` work on refres
 
 ## Design decisions
 
-- **"Civic paper", not crypto neon.** Warm paper, black ink, one ballot-green accent saved for "stamped" moments (the Open
-  label, the Recorded stamp). Fraunces for titles, IBM Plex Sans for text, IBM Plex Mono for hashes and numbers. Results are
-  thick ink bars with the count and percentage written out, so colour is never the only signal. Two variations were built
-  and compared; the reasoning is in `docs/BUILD_LOG.md` (Phase 5).
+- **"Web3 Field Guide" palette.** Cream graph-paper background, green-black ink, thick outlines with solid offset shadows,
+  and bright sticker accents (mint, tomato, butter, lilac, sky) used as small highlights. Fraunces for headings, Figtree for
+  text, JetBrains Mono for hashes and numbers. Chart colours are the same hues at steps validated for colour-blind readers,
+  and every figure is also written as text, so colour is never the only signal.
 - **Proper dark mode and reduced motion.** Every text colour passes WCAG AA in both themes (lowest 5.6:1); the stamp animation
   is skipped if your system asks for less motion.
 - **Limits are counted in bytes, like the contract.** A Tamil letter or emoji uses 3–4 bytes, so the form shows byte counters.

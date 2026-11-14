@@ -647,3 +647,4 @@ Commit made: feat: calmer backdrop, plain receipt/stats boxes, green wallet butt
 - I added six more words to the dictionary (here's, MetaMask, minutes, that's, rehearses, mistakes).
 - Rebuild: `python frontend/scripts/video/voice.py …`, then `VIDEO=1 VO_DURS=<durs.json> npm run video`, then the mix
   (each clip at its mark, trimmed by trimStartMs, loudness -16 LUFS, H.264 + AAC).
+- v2 tweak (owner): chapter labels removed. The subtitle is now one slim line (15px, 12px from the bottom, 86% opaque), so it covers much less of the screen. The mix step is saved as frontend/scripts/video/mix.py.

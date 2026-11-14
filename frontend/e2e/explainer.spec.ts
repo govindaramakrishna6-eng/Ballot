@@ -16,7 +16,7 @@ const durations: number[] = process.env.VO_DURS
   ? JSON.parse(readFileSync(process.env.VO_DURS, "utf8"))
   : script.map((l) => l.text.split(" ").length / 2.4); // rough reading pace when no audio is supplied
 
-/** A visible pointer (headless recordings have none), a chapter chip and a subtitle bar. Our own text, set via textContent. */
+/** A visible pointer (headless recordings have none) and a compact subtitle. Our own text, set via textContent. */
 function installOverlay() {
   const ready = () => {
     if (document.getElementById("vid-cursor")) return;
@@ -41,27 +41,19 @@ function installOverlay() {
     const box = document.createElement("div");
     box.id = "vid-caption";
     box.style.cssText =
-      "position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:2147483646;pointer-events:none;" +
-      "display:flex;flex-direction:column;align-items:center;gap:8px;width:max-content;max-width:1040px;" +
+      "position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:2147483646;pointer-events:none;" +
+      "width:max-content;max-width:900px;" +
       "opacity:0;transition:opacity 250ms";
-    const chip = document.createElement("div");
-    chip.id = "vid-chapter";
-    chip.style.cssText =
-      "font:600 13px/1 'JetBrains Mono Variable',monospace;letter-spacing:.08em;text-transform:uppercase;" +
-      "background:#1D7F5C;color:#FFFDF8;padding:7px 12px;border:2px solid #1D2B2A;border-radius:8px";
     const sub = document.createElement("div");
     sub.id = "vid-sub";
     sub.style.cssText =
-      "background:rgba(29,43,42,.94);color:#FFFDF8;font:500 20px/1.4 'Figtree Variable',Figtree,system-ui,sans-serif;" +
-      "padding:10px 20px;border-radius:12px;text-align:center";
-    box.append(chip, sub);
+      "background:rgba(29,43,42,.86);color:#FFFDF8;font:500 15px/1.35 'Figtree Variable',Figtree,system-ui,sans-serif;" +
+      "padding:5px 12px;border-radius:8px;text-align:center";
+    box.append(sub);
     document.body.appendChild(box);
     const saved = sessionStorage.getItem("vid-caption");
     if (saved) {
-      const { chapter, text } = JSON.parse(saved);
-      chip.textContent = chapter;
-      chip.style.display = chapter ? "" : "none";
-      sub.textContent = text;
+      sub.textContent = JSON.parse(saved).text;
       box.style.opacity = "1";
     }
   };
@@ -69,20 +61,17 @@ function installOverlay() {
   else addEventListener("DOMContentLoaded", ready);
 }
 
-async function caption(page: Page, chapter: string, text: string) {
+async function caption(page: Page, text: string) {
   await page.evaluate(
-    ({ chapter, text }) => {
-      sessionStorage.setItem("vid-caption", JSON.stringify({ chapter, text }));
+    ({ text }) => {
+      sessionStorage.setItem("vid-caption", JSON.stringify({ text }));
       const box = document.getElementById("vid-caption");
-      const chip = document.getElementById("vid-chapter");
       const sub = document.getElementById("vid-sub");
-      if (!box || !chip || !sub) return;
-      chip.textContent = chapter;
-      chip.style.display = chapter ? "" : "none";
+      if (!box || !sub) return;
       sub.textContent = text;
       box.style.opacity = "1";
     },
-    { chapter, text },
+    { text },
   );
 }
 
@@ -161,7 +150,7 @@ test("explainer video", async ({ page, wallet }) => {
   const beat = async (act?: () => Promise<unknown>) => {
     const i = n++;
     marks.push(Date.now() - t0);
-    await caption(page, script[i].chapter, script[i].text);
+    await caption(page, script[i].text);
     await Promise.all([act?.(), page.waitForTimeout(durations[i] * 1000 + GAP_MS)]);
   };
 

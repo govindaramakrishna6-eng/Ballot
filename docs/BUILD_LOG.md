@@ -540,3 +540,23 @@ Test/build results (actually observed): vitest 38 passed; tsc OK; oxlint 0 new; 
   chart palette validator: PASS light + dark.
 Commit made: feat(design): apply the Web3 Field Guide palette across the app
 ```
+
+---
+
+## Calm pass: reduce colour (owner feedback)
+
+### Decisions
+- **Colour now only on**: tomato primary buttons; one green "live" dot (ticker); the verified state (vote seal, mint "Recorded" stamp on the dark receipt); meaningful status (green Open, amber Closing soon, red Closed/Cancelled/failed).
+- **Ticker**: smaller, muted, 85% opacity (72% was tried but dropped muted text to 3.5:1; 85% keeps 4.68:1), neutral outlined tags, no coloured counts.
+- **Neutralised**: trust chips, step numbers, section kickers, "LIVE" activity badge, activity notes (now plain cards), icon badges (one quiet treatment), empty-state icons, notices, no-wallet note, option selection, journey steps, nav/tab underlines, hero highlighter, KPI highlight, single-series charts (ink/gray), FAQ hover, footer links and dot.
+- **"Connect Wallet" is now an ink button**, so tomato is reserved for the primary actions.
+- **Receipt = dark neutral proof artifact** (`#17211F`, muted labels), with one subtle mint accent on the "Recorded" stamp; "Specimen" is a gray outlined label.
+- Kept categorical colour on the results part-to-whole bars — there colour identifies the options (CVD-validated) and every figure is also written as text.
+
+```
+STATUS REPORT
+Done: colour reduced in ticker, pills/badges, feature/security cards, receipt, FAQ/footer; wallet button neutral.
+Files created/changed (paths): frontend/src/index.css (calm layer), frontend/src/main.tsx, CLAUDE.md, docs/screenshots/*
+Test/build results (actually observed): vitest 38 passed; tsc OK; oxlint 0 new; E2E 51 passed (1.6m); ticker text 4.68:1.
+Commit made: style: calm pass — colour only for primary actions, live, verified and status
+```

@@ -37,12 +37,12 @@ function paperTheme(base: ReturnType<typeof lightTheme>) {
     ...base,
     colors: {
       ...base.colors,
-      // RainbowKit paints "Connect Wallet" (and its modal buttons) with the accent: Field Guide mint.
-      accentColor: "var(--mint)",
-      accentColorForeground: "var(--sticker-ink)",
+      // "Connect Wallet" is a calm ink button — colour is reserved for the primary actions (tomato).
+      accentColor: "var(--ink)",
+      accentColorForeground: "var(--paper)",
       // Field Guide: the "Connect wallet" button is a mint sticker with ink text.
-      connectButtonBackground: "var(--mint)",
-      connectButtonText: "var(--sticker-ink)",
+      connectButtonBackground: "var(--card)",
+      connectButtonText: "var(--ink)",
       connectButtonInnerBackground: "var(--card)",
     },
     shadows: { ...base.shadows, connectButton: "0 0 0 2px var(--edge), 3px 3px 0 2px var(--shadow-color)", dialog: "none", profileDetailsAction: "none", selectedOption: "none", selectedWallet: "none", walletLogo: "none" },

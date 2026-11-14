@@ -989,3 +989,93 @@ a.tk-item:hover, a.tk-item:focus-visible { background: color-mix(in srgb, var(--
 .empty-icon { background: var(--butter); color: var(--sticker-ink); border: 2px solid var(--edge); }
 .site-footer { background: var(--paper-2); border-top: 2px solid var(--edge); }
 .toast { background: var(--ink); color: var(--paper); border: 2px solid var(--edge); }
+
+/* =====================================================================
+   Calm layer (owner feedback): colour only for primary buttons, one live
+   indicator, the verified/success state, and meaningful status (green open,
+   amber closing soon, red failed/closed). Everything else white/gray/black.
+   ===================================================================== */
+
+/* 1. Live ticker — small, muted, quiet; one green dot */
+.ticker { background: var(--paper); border-top: 1px solid var(--line); font-size: .72rem; opacity: .85; /* .85 keeps muted text ≥ 4.5:1 */ transition: opacity .2s ease; }
+.ticker:hover, .ticker:focus-within { opacity: 1; }
+.tk-live { background: transparent; color: var(--muted); border-right: 1px solid var(--line); font-size: .6rem; padding: 0 .75rem; }
+.tk-live .pulse-dot { background: var(--ok); }
+.tk-item { padding: .35rem .75rem; gap: .4rem; color: var(--muted); }
+.tk-tag, .tk-tag-poll, .tk-tag-vote { background: transparent; color: var(--muted); border: 1px solid var(--line); font-size: .56rem; padding: .18rem .35rem; }
+.tk-lead { font-weight: 500; color: var(--muted); }
+.tk-up, .tk-delta { color: var(--muted); font-weight: 400; }
+.tk-muted { font-size: .66rem; }
+.tk-sep { color: var(--line); }
+
+/* 2. Pills and badges — neutral by default; colour only for meaningful state */
+.label { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+.label-open { background: color-mix(in srgb, var(--ok) 12%, var(--card)); color: var(--ok); border-color: color-mix(in srgb, var(--ok) 45%, transparent); }
+.label-closing-soon { background: color-mix(in srgb, var(--butter) 40%, var(--card)); color: var(--warn); border-color: color-mix(in srgb, var(--butter) 80%, var(--ink) 20%); }
+.label-closed, .label-cancelled { background: color-mix(in srgb, var(--bad) 9%, var(--card)); color: var(--danger); border-color: color-mix(in srgb, var(--bad) 40%, transparent); }
+.label-stamp { background: transparent; color: var(--ink); border: 1px solid var(--edge); font-weight: 700; }
+.countdown-soon { background: color-mix(in srgb, var(--butter) 40%, var(--card)); color: var(--warn); border: 1px solid color-mix(in srgb, var(--butter) 80%, var(--ink) 20%); }
+.trust-chip { background: transparent; border: 1px solid var(--line); box-shadow: none; color: var(--muted); }
+.trust-chip svg, .trust-chip:nth-child(n) svg { background: transparent; stroke: var(--muted); padding: 0; }
+.live-badge { background: transparent; color: var(--muted); border: 1px solid var(--line); box-shadow: none; }
+.live-badge .pulse-dot { background: var(--faint); animation: none; }
+.note-kind, .note-kind-vote, .note-kind-created, .note-kind-closed, .note-kind-cancelled { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+.step-card .step-n { background: transparent; color: var(--faint); border: 1px solid var(--line); }
+.kicker { color: var(--muted); }
+.nav-link-active { text-decoration-color: var(--ink); }
+.tab[aria-selected="true"] { border-bottom-color: var(--ink); }
+/* "Specimen" — a subtle outlined label, never coloured */
+.hero-receipt .stamp-hero { color: var(--muted); border: 1px solid currentColor; border-style: solid; font-size: .62rem; padding: .3rem .45rem; transform: none; }
+[data-testid="latest-receipt-specimen"] .stamp-hero { opacity: .8; }
+
+/* 3. Feature / security cards — one quiet icon treatment, identical card backgrounds */
+.icon-badge, .grid-3 > li:nth-child(n) .icon-badge, .grid-2 > li:nth-child(n) .icon-badge {
+  background: var(--paper-2); color: var(--ink); border: 1px solid var(--line); box-shadow: none;
+}
+.icon-badge svg { opacity: .8; }
+.proof-icon { stroke: var(--muted); }
+.empty-icon { background: var(--paper-2); color: var(--muted); border: 1px solid var(--line); }
+.note { background: var(--card); color: var(--ink); }
+.note .note-meta, .note .note-time { color: var(--muted); }
+@media (prefers-color-scheme: dark) { .note { background: var(--card); } }
+.notice { background: var(--paper-2); }
+.hint[data-testid="no-wallet"] { background: var(--paper-2); color: var(--ink); }
+.hint[data-testid="no-wallet"] .link { color: var(--ink); }
+.live-notice { background: var(--card); color: var(--ink); box-shadow: var(--hard-sm); }
+.live-notice .muted { color: var(--muted); }
+.option-row:has(input:checked) { background: var(--paper-2); color: var(--ink); }
+.option-row input { accent-color: var(--ink); }
+.jstep-done .jnode { background: var(--ink); color: var(--paper); }
+.btn-secondary:hover:not(:disabled), .btn-chip:hover, .icon-btn:hover { background: var(--paper-2); color: var(--ink); }
+.hl { background: none; padding: 0; }
+.kpi:nth-child(1) .kpi-value { box-shadow: none; }
+.ranked-fill { background: var(--ink); }
+.chart-line, .chart-dot { stroke: var(--ink); }
+.chart-dot { fill: var(--ink); stroke: var(--card); }
+.chart-area { fill: var(--ink); opacity: .07; }
+@media (prefers-color-scheme: dark) { .bar-fill, .ranked-fill { background: var(--muted); } }
+
+/* 4. Receipt — a dark, neutral proof artifact; one subtle accent for "verified" */
+.receipt, .hero-receipt { background: #17211F; color: #E9E4D9; box-shadow: none; border: 0; }
+.receipt .receipt-grid dt, .hero-receipt .receipt-grid dt { color: #93A09D; }
+.receipt-title { color: #C9C3B7; }
+.receipt .link, .hero-receipt .link { color: #E9E4D9; text-decoration-color: #5E6E6B; }
+.receipt .copy-btn { color: #93A09D; }
+.receipt-foot { border-top-color: #33413F; color: #93A09D; }
+.receipt .stamp, .hero-receipt [data-testid] .stamp, [data-testid="latest-receipt"] .stamp-hero {
+  color: var(--mint); border: 1px solid color-mix(in srgb, var(--mint) 60%, transparent); border-style: solid;
+  font-size: .62rem; padding: .3rem .45rem; transform: none;
+}
+@media (prefers-color-scheme: dark) {
+  .receipt, .hero-receipt { background: #0C1312; color: #E9E4D9; }
+  .receipt .link, .hero-receipt .link { color: #E9E4D9; }
+}
+
+/* 5. FAQ + footer — plain text, no coloured hovers or dots */
+.faq-item summary:hover { background: transparent; color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+.faq-chevron { color: var(--faint); }
+.site-footer { background: var(--paper); border-top: 1px solid var(--line); }
+.footer-col a { color: var(--muted); }
+.footer-col a:hover { color: var(--ink); }
+.footer-h { color: var(--ink); }
+.network-status .pulse-dot { background: var(--faint); animation: none; }

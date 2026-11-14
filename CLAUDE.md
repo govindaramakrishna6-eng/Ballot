@@ -234,6 +234,10 @@ The feel: a modern polling station. Paper, ink, stamps, receipts. Calm, trustwor
   used sparingly: mint `#A8E6CF` / mint-deep `#1D7F5C`, tomato `#FF6B4A` (main buttons) / tomato-soft
   `#FFD9CF`, butter `#FFD66B` / butter-soft `#FFF1C7`, lilac `#C8B6FF`, sky `#9ED3F0`; status ok `#1D7F5C`,
   bad `#D9432A`. Text-only AA steps: danger `#B43722`, focus ring `#E05E41`. Dark mode is derived and AA-checked.
+- Colour discipline (owner feedback): colour only for primary buttons (tomato), ONE live indicator (green
+  dot in the ticker), the verified/success state, and meaningful status (green open, amber closing soon,
+  red failed/closed). Cards, tags, ticker, hashes, icons, kickers, FAQ and footer stay white/gray/black.
+  Categorical colour remains only where it identifies data (results part-to-whole bars).
 - Type: Fraunces for headings, Figtree for body, JetBrains Mono for hashes/addresses/numbers.
   Tabular numerals for vote counts.
 - Motifs: perforated/dashed edges on the ballot receipt, a subtle stamp animation when a vote

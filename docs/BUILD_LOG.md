@@ -619,3 +619,11 @@ Not done / known issues: sound before any interaction depends on the browser's a
 Assumptions I made: the tour shows on the homepage only, once per browser.
 What the next phase needs from this one: nothing.
 Commit made: feat: calmer backdrop, plain receipt/stats boxes, green wallet button, live block boxes, first-visit tour
+
+## Explainer video (owner request)
+
+- `docs/ballot-explainer.mp4`: a 45 s, 1280×720, silent video with captions. It records the real app on a local chain with
+  Playwright (`e2e/explainer.spec.ts`, run `cd frontend && npm run video`), then ffmpeg trims and encodes it to H.264.
+- Decisions: the captions are drawn into the page, not burned in afterwards, so they use the app's own fonts. A drawn cursor
+  shows because headless recordings have none. There's no voice-over because no speech tool is available, so captions
+  carry the story. The local chain was used so the video needs no test ETH and shows real transactions.

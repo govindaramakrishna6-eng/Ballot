@@ -633,3 +633,17 @@ Commit made: feat: calmer backdrop, plain receipt/stats boxes, green wallet butt
   (gets, enforces, opens, results, Ethereum, Etherscan), so I added their pronunciations; without them the engine silently
   skipped those words. Each line fits its slot (longest 12.0 s in a 12.8 s slot). The mix was loudness-normalised to -16 LUFS
   and muxed into `docs/ballot-explainer.mp4` as AAC.
+
+## Full explainer video, v2 (owner request: "rushed", extend to 1:30–2:00)
+
+- `docs/ballot-explainer.mp4` is now 1:59 with 22 narrated beats: the problem, meet Ballot, live blocks, connect, create
+  (question, options, deadline, byte counters, permanent review, sign), vote (pre-flight check), receipt, one wallet one vote,
+  live results, the deadline passing and a winner being declared (chain time travel), the results page, My votes, why trust it,
+  and the end card.
+- Decisions: the voice is generated first and each clip measured. The recorder (`e2e/explainer.spec.ts`) runs each beat's
+  actions while its line is spoken and waits for the line to finish, so picture and voice can't drift or overlap. The script is
+  shared in `e2e/explainer-script.json`, and subtitles plus a chapter chip are drawn in the app's own fonts.
+  `docs/ballot-voiceover.srt` is generated from the real beat times. Narration speed is 0.95 with 0.55 s pauses.
+- I added six more words to the dictionary (here's, MetaMask, minutes, that's, rehearses, mistakes).
+- Rebuild: `python frontend/scripts/video/voice.py …`, then `VIDEO=1 VO_DURS=<durs.json> npm run video`, then the mix
+  (each clip at its mark, trimmed by trimStartMs, loudness -16 LUFS, H.264 + AAC).

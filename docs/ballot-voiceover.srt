@@ -1,27 +1,88 @@
 1
-00:00:00,300 --> 00:00:07,800
-This is Ballot: polls on Ethereum where every single vote can be proven.
-Anyone can create a poll, and every wallet gets exactly one vote.
+00:00:00,151 --> 00:00:06,403
+Most online polls ask you to trust whoever runs them. They can quietly change the count, and you would never know.
 
 2
-00:00:08,000 --> 00:00:10,800
-First, connect your wallet.
+00:00:07,309 --> 00:00:14,035
+Ballot is different. It's a voting app built on Ethereum, where every poll and every vote is recorded on a public blockchain.
 
 3
-00:00:11,000 --> 00:00:21,800
-Then create a poll: a question, two to ten options, and a deadline.
-The smart contract enforces the rules, and once it's signed, nobody can edit it, not even us.
+00:00:14,601 --> 00:00:20,563
+These boxes are live blocks from the chain. The green ones hold Ballot votes and polls, happening right now.
 
 4
-00:00:22,000 --> 00:00:34,800
-To vote, pick an option. The app checks your vote before your wallet even opens.
-Once it's confirmed, you get a ballot receipt: the transaction, block and time, read straight from the blockchain.
-Anyone can verify it on Etherscan.
+00:00:21,141 --> 00:00:23,262
+Here's how it works, from start to finish.
 
 5
-00:00:35,000 --> 00:00:40,800
-Results update live, for everyone, with no wallet needed.
+00:00:23,822 --> 00:00:29,887
+First, connect a wallet, like MetaMask. There's no sign up and no password. Your wallet is your identity.
 
 6
-00:00:41,200 --> 00:00:44,800
+00:00:30,442 --> 00:00:33,109
+Now, let's create a poll. Type your question.
+
+7
+00:00:34,246 --> 00:00:36,147
+Add between two and ten options.
+
+8
+00:00:37,643 --> 00:00:41,035
+And pick a deadline, anywhere from five minutes to thirty days.
+
+9
+00:00:41,595 --> 00:00:47,057
+The counters show bytes, not letters, because that's exactly how the smart contract measures them.
+
+10
+00:00:47,614 --> 00:00:54,585
+Before you sign, Ballot shows you a review. A poll is permanent. Once it's on the chain, nobody can edit it, not even us.
+
+11
+00:00:55,142 --> 00:00:58,614
+Sign it, and within seconds, the poll is live for everyone.
+
+12
+00:00:59,171 --> 00:01:02,364
+Other members are already voting. Let's cast ours.
+
+13
+00:01:02,922 --> 00:01:08,741
+Before your wallet even opens, the app rehearses the vote, so mistakes are caught early, and for free.
+
+14
+00:01:09,297 --> 00:01:13,932
+Checked, signed, broadcast, recorded. And here's the best part: your ballot receipt.
+
+15
+00:01:14,491 --> 00:01:23,598
+It shows the transaction, the block, and the exact time. It's read back from the blockchain itself, so it's proof, not a promise. Anyone can check it on Etherscan.
+
+16
+00:01:24,161 --> 00:01:28,718
+Try to vote twice, and the contract simply says no. One wallet, one vote.
+
+17
+00:01:29,273 --> 00:01:33,160
+Results update live, with a count and a percentage for every option.
+
+18
+00:01:33,716 --> 00:01:39,370
+When the deadline passes, the poll closes by itself, using blockchain time, and the winner is declared.
+
+19
+00:01:39,928 --> 00:01:45,655
+The results page gathers every poll, live and final. Anyone can view it, even without a wallet.
+
+20
+00:01:46,210 --> 00:01:49,279
+And My votes keeps track of every poll you've taken part in.
+
+21
+00:01:49,837 --> 00:01:55,468
+No admin. No hidden database. No way to change a vote. Just open, verifiable voting.
+
+22
+00:01:56,029 --> 00:01:57,822
 Ballot. Every vote, provable.
+

@@ -1,13 +1,22 @@
-// Not a test: records a ~45 s explainer video of the real app on a local chain (run: npm run video).
-// The raw recording lands in test-results/; scripts/make-video.sh turns it into docs/ballot-explainer.mp4.
+// Not a test: records the explainer video of the real app on a local chain (run: npm run video).
+// Each narration line ("beat") from explainer-script.json is shown as a subtitle while its on-screen actions run,
+// and the next beat waits until the spoken line (durations from VO_DURS) has finished, so voice and picture stay in step.
+// Writes test-results/explainer-marks.json (when each beat started) for the audio mix.
+import { readFileSync, writeFileSync } from "node:fs";
 import type { Locator, Page } from "@playwright/test";
 import { chain, expect, test } from "./fixtures";
+import script from "./explainer-script.json" with { type: "json" };
 
 test.skip(!process.env.VIDEO, "only when VIDEO=1");
 test.use({ viewport: { width: 1280, height: 720 }, video: { mode: "on", size: { width: 1280, height: 720 } } });
-test.setTimeout(180_000);
+test.setTimeout(400_000);
 
-/** A visible pointer (headless recordings have none) plus a caption bar. Our own fixed text, set via textContent. */
+const GAP_MS = 550; // breathing room after each spoken line
+const durations: number[] = process.env.VO_DURS
+  ? JSON.parse(readFileSync(process.env.VO_DURS, "utf8"))
+  : script.map((l) => l.text.split(" ").length / 2.4); // rough reading pace when no audio is supplied
+
+/** A visible pointer (headless recordings have none), a chapter chip and a subtitle bar. Our own text, set via textContent. */
 function installOverlay() {
   const ready = () => {
     if (document.getElementById("vid-cursor")) return;
@@ -29,39 +38,69 @@ function installOverlay() {
     document.body.appendChild(cursor);
     addEventListener("mousemove", (e) => (cursor.style.transform = `translate(${e.clientX - 3}px,${e.clientY - 2}px)`), true);
 
-    const cap = document.createElement("div");
-    cap.id = "vid-caption";
-    cap.style.cssText =
-      "position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:2147483646;pointer-events:none;" +
-      "background:#1D2B2A;color:#FFFDF8;font:600 22px/1.35 'Figtree Variable',Figtree,system-ui,sans-serif;" +
-      "padding:12px 22px;border-radius:12px;box-shadow:4px 4px 0 #1D7F5C;max-width:1060px;text-align:center;" +
+    const box = document.createElement("div");
+    box.id = "vid-caption";
+    box.style.cssText =
+      "position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:2147483646;pointer-events:none;" +
+      "display:flex;flex-direction:column;align-items:center;gap:8px;width:max-content;max-width:1040px;" +
       "opacity:0;transition:opacity 250ms";
-    document.body.appendChild(cap);
+    const chip = document.createElement("div");
+    chip.id = "vid-chapter";
+    chip.style.cssText =
+      "font:600 13px/1 'JetBrains Mono Variable',monospace;letter-spacing:.08em;text-transform:uppercase;" +
+      "background:#1D7F5C;color:#FFFDF8;padding:7px 12px;border:2px solid #1D2B2A;border-radius:8px";
+    const sub = document.createElement("div");
+    sub.id = "vid-sub";
+    sub.style.cssText =
+      "background:rgba(29,43,42,.94);color:#FFFDF8;font:500 20px/1.4 'Figtree Variable',Figtree,system-ui,sans-serif;" +
+      "padding:10px 20px;border-radius:12px;text-align:center";
+    box.append(chip, sub);
+    document.body.appendChild(box);
     const saved = sessionStorage.getItem("vid-caption");
     if (saved) {
-      cap.textContent = saved;
-      cap.style.opacity = "1";
+      const { chapter, text } = JSON.parse(saved);
+      chip.textContent = chapter;
+      chip.style.display = chapter ? "" : "none";
+      sub.textContent = text;
+      box.style.opacity = "1";
     }
   };
   if (document.body) ready();
   else addEventListener("DOMContentLoaded", ready);
 }
 
-async function caption(page: Page, text: string) {
-  await page.evaluate((t) => {
-    sessionStorage.setItem("vid-caption", t);
-    const cap = document.getElementById("vid-caption");
-    if (!cap) return;
-    cap.style.opacity = t ? "1" : "0";
-    cap.textContent = t;
-  }, text);
+async function caption(page: Page, chapter: string, text: string) {
+  await page.evaluate(
+    ({ chapter, text }) => {
+      sessionStorage.setItem("vid-caption", JSON.stringify({ chapter, text }));
+      const box = document.getElementById("vid-caption");
+      const chip = document.getElementById("vid-chapter");
+      const sub = document.getElementById("vid-sub");
+      if (!box || !chip || !sub) return;
+      chip.textContent = chapter;
+      chip.style.display = chapter ? "" : "none";
+      sub.textContent = text;
+      box.style.opacity = "1";
+    },
+    { chapter, text },
+  );
+}
+
+async function glide(page: Page, target: Locator, steps = 28) {
+  const box = (await target.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps });
+}
+
+/** Scroll an element into view the way a person would (smoothly), then let it settle. */
+async function smoothTo(page: Page, target: Locator, block: ScrollLogicalPosition = "center") {
+  await target.evaluate((el, b) => el.scrollIntoView({ behavior: "smooth", block: b }), block);
+  await page.waitForTimeout(900);
 }
 
 /** Glide the pointer to an element, pause like a person would, then click. */
-async function press(page: Page, target: Locator, pause = 250) {
+async function press(page: Page, target: Locator, pause = 350) {
   await target.scrollIntoViewIfNeeded();
-  const box = (await target.boundingBox())!;
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 18 });
+  await glide(page, target, 24);
   await page.waitForTimeout(pause);
   await target.click();
 }
@@ -73,12 +112,12 @@ async function endCard(page: Page) {
     const card = document.createElement("div");
     card.style.cssText =
       "position:fixed;inset:0;z-index:2147483647;background:#FAF6EE;display:flex;flex-direction:column;align-items:center;" +
-      "justify-content:center;gap:18px;color:#1D2B2A;opacity:0;transition:opacity 500ms";
+      "justify-content:center;gap:18px;color:#1D2B2A;opacity:0;transition:opacity 600ms";
     const title = document.createElement("div");
     title.textContent = "Ballot";
-    title.style.cssText = "font:700 96px/1 'Fraunces Variable',Fraunces,serif;letter-spacing:-0.02em";
+    title.style.cssText = "font:700 104px/1 'Fraunces Variable',Fraunces,serif;letter-spacing:-0.02em";
     const line = document.createElement("div");
-    line.textContent = "Every vote is provable — and you get the receipt.";
+    line.textContent = "Every vote is provable, and you get the receipt.";
     line.style.cssText = "font:500 28px/1.3 'Figtree Variable',Figtree,sans-serif;color:#4B5A58";
     const url = document.createElement("div");
     url.textContent = "ballot-omega.vercel.app  ·  Ethereum Sepolia";
@@ -92,92 +131,173 @@ async function endCard(page: Page) {
 }
 
 test("explainer video", async ({ page, wallet }) => {
-  // Make the chain look lived-in: a couple of polls with votes from other wallets.
-  const featured = await chain.createPoll({
+  const bodyStart = Date.now(); // ≈ when the recording began (the page already exists)
+
+  // A lived-in chain: polls with votes from other wallets. One closes within days so "final" results exist later.
+  const cleanup = await chain.createPoll({
     from: 3,
     title: "Which day works for the monthly clean-up?",
     options: ["Saturday", "Sunday"],
+    durationSec: 3n * 86_400n,
   });
-  for (const [v, o] of [[10, 0], [11, 1], [12, 0], [13, 0]] as const) await chain.vote(featured, o, v);
+  for (const [v, o] of [[10, 0], [11, 1], [12, 0], [13, 0]] as const) await chain.vote(cleanup, o, v);
   const garden = await chain.createPoll({
     from: 4,
     title: "Should the community garden add a second compost bay?",
     options: ["Yes, this season", "Yes, next spring", "No"],
+    durationSec: 30n * 86_400n,
   });
   for (const [v, o] of [[10, 0], [11, 0], [12, 1], [13, 2], [14, 0]] as const) await chain.vote(garden, o, v);
 
-  // Let the brand intro play this time (the fixture marks it "seen" for normal tests).
-  await page.addInitScript(() => sessionStorage.removeItem("ballot:intro-seen"));
+  await page.addInitScript(() => sessionStorage.removeItem("ballot:intro-seen")); // let the brand intro play
   await page.addInitScript(installOverlay);
   await wallet.install({ as: 2 });
+  const nav = page.locator("nav[aria-label='Main']");
 
-  // 1 · Intro + what it is
+  let t0 = 0;
+  const marks: number[] = [];
+  let n = 0;
+  /** Show the next narration line and run its actions; move on only when both the line and the actions are done. */
+  const beat = async (act?: () => Promise<unknown>) => {
+    const i = n++;
+    marks.push(Date.now() - t0);
+    await caption(page, script[i].chapter, script[i].text);
+    await Promise.all([act?.(), page.waitForTimeout(durations[i] * 1000 + GAP_MS)]);
+  };
+
   await page.goto("/");
-  await page.waitForTimeout(2600);
-  await caption(page, "Ballot: polls on Ethereum where every vote is provable.");
-  await page.waitForTimeout(2600);
-  await caption(page, "Anyone can create a poll. Each wallet votes once. Everyone can see the results.");
-  await page.mouse.move(400, 560, { steps: 20 });
-  const ballotTile = page.locator(".tile-ballot").last();
-  if (await ballotTile.count()) {
-    const b = (await ballotTile.boundingBox())!;
-    await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 20 });
-  }
-  await page.waitForTimeout(2400);
+  t0 = Date.now();
 
-  // 2 · Connect
-  await caption(page, "1  Connect your wallet: MetaMask or any browser wallet.");
-  await press(page, page.getByRole("button", { name: "Connect Wallet" }), 400);
-  await press(page, page.getByRole("button", { name: /Browser Wallet|Injected/i }), 300);
-  await expect(page.getByRole("button", { name: "Connect Wallet" })).toHaveCount(0);
-  await page.waitForTimeout(900);
+  // The problem / meet Ballot
+  await beat(async () => {
+    await page.waitForTimeout(3200); // intro animation
+    await page.mouse.move(640, 300, { steps: 30 });
+  });
+  await beat(async () => {
+    const chips = page.locator(".hero-ctas").first();
+    await glide(page, chips, 30);
+    await page.mouse.move(460, 470, { steps: 40 });
+    await page.mouse.move(820, 470, { steps: 60 });
+  });
+  await beat(async () => {
+    const tile = page.locator(".tile-ballot").last();
+    if (await tile.count()) await glide(page, tile, 34);
+  });
+  await beat(() => smoothTo(page, page.locator("#how-it-works"), "start"));
 
-  // 3 · Create
-  await caption(page, "2  Create a poll: a question, 2 to 10 options and a deadline.");
-  await press(page, page.locator("nav[aria-label='Main']").getByRole("link", { name: "Create" }));
+  // Step 1 · Connect
+  await beat(async () => {
+    await page.evaluate(() => scrollTo({ top: 0, behavior: "smooth" }));
+    await page.waitForTimeout(900);
+    await press(page, page.getByRole("button", { name: "Connect Wallet" }), 500);
+    await page.waitForTimeout(900);
+    await press(page, page.getByRole("button", { name: /Browser Wallet|Injected/i }), 400);
+    await expect(page.getByRole("button", { name: "Connect Wallet" })).toHaveCount(0);
+  });
+
+  // Step 2 · Create
   const title = page.getByLabel("Question");
-  await press(page, title, 100);
-  await title.pressSequentially("Where should the club go for the year-end trip?", { delay: 28 });
-  await press(page, page.getByPlaceholder("Option 1"), 80);
-  await page.getByPlaceholder("Option 1").pressSequentially("Hills", { delay: 40 });
-  await press(page, page.getByPlaceholder("Option 2"), 80);
-  await page.getByPlaceholder("Option 2").pressSequentially("Beach", { delay: 40 });
-  await press(page, page.getByRole("button", { name: "Add option" }), 120);
-  await page.getByPlaceholder("Option 3").pressSequentially("Heritage town", { delay: 35 });
-  await press(page, page.getByRole("button", { name: "7 days" }), 150);
-  await press(page, page.getByRole("button", { name: "Review" }), 200);
-  await caption(page, "The contract enforces every rule. Once it's signed, nobody can edit it, not even us.");
-  await expect(page.getByTestId("review")).toBeVisible();
-  await page.waitForTimeout(1300);
-  await press(page, page.getByRole("button", { name: "Sign and create poll" }), 250);
-  await expect(page).toHaveURL(/\/poll\/\d+$/);
-  const id = BigInt(page.url().split("/").pop()!);
-  // Other club members vote too, so the results have something to show.
-  for (const [v, o] of [[10, 1], [11, 0], [12, 1]] as const) await chain.vote(id, o, v);
-  await page.waitForTimeout(800);
+  await beat(async () => {
+    await press(page, nav.getByRole("link", { name: "Create" }));
+    await press(page, title, 150);
+    await title.pressSequentially("Where should the club go for the year-end trip?", { delay: 32 });
+  });
+  await beat(async () => {
+    await press(page, page.getByPlaceholder("Option 1"), 100);
+    await page.getByPlaceholder("Option 1").pressSequentially("Hills", { delay: 45 });
+    await press(page, page.getByPlaceholder("Option 2"), 100);
+    await page.getByPlaceholder("Option 2").pressSequentially("Beach", { delay: 45 });
+    await press(page, page.getByRole("button", { name: "Add option" }), 150);
+    await page.getByPlaceholder("Option 3").pressSequentially("Heritage town", { delay: 40 });
+  });
+  await beat(() => press(page, page.getByRole("button", { name: "7 days" }), 300));
+  await beat(async () => {
+    await glide(page, page.getByText(/\/60 bytes/).nth(2), 30);
+    await page.waitForTimeout(1200);
+    await glide(page, page.getByText(/\/120 bytes/).first(), 30);
+  });
+  await beat(async () => {
+    await press(page, page.getByRole("button", { name: "Review" }), 300);
+    await expect(page.getByTestId("review")).toBeVisible();
+    const notice = page.getByText("This is permanent and can't be edited.");
+    await smoothTo(page, notice);
+    await glide(page, notice, 30);
+  });
+  let id = 0n;
+  await beat(async () => {
+    await press(page, page.getByRole("button", { name: "Sign and create poll" }), 300);
+    await expect(page).toHaveURL(/\/poll\/\d+$/);
+    id = BigInt(page.url().split("/").pop()!);
+  });
 
-  // 4 · Vote + receipt
-  await caption(page, "3  Vote once. The app checks the vote before your wallet even opens.");
-  await press(page, page.getByRole("radio", { name: "Beach" }), 250);
-  await press(page, page.getByRole("button", { name: "Cast vote" }), 250);
-  await expect(page.getByTestId("receipt")).toBeVisible();
-  await caption(page, "You get a ballot receipt: transaction, block and time, read back from the blockchain.");
-  await page.getByTestId("receipt").scrollIntoViewIfNeeded();
-  const r = (await page.getByTestId("receipt").boundingBox())!;
-  await page.mouse.move(r.x + r.width * 0.6, r.y + r.height * 0.55, { steps: 25 });
-  await page.waitForTimeout(4600);
-  await caption(page, "Anyone can check it on Etherscan. No need to trust this website.");
-  await page.waitForTimeout(3200);
+  // Step 3 · Vote
+  await beat(async () => {
+    for (const [v, o] of [[10, 1], [11, 0], [12, 1]] as const) {
+      await chain.vote(id, o, v);
+      await page.waitForTimeout(500);
+    }
+    await smoothTo(page, page.getByRole("radio", { name: "Beach" }));
+  });
+  await beat(async () => {
+    await press(page, page.getByRole("radio", { name: "Beach" }), 400);
+    await page.waitForTimeout(500);
+    await press(page, page.getByRole("button", { name: "Cast vote" }), 500);
+  });
 
-  // 5 · Results
-  await caption(page, "4  Results update live, for everyone, even without a wallet.");
-  await press(page, page.locator("nav[aria-label='Main']").getByRole("link", { name: "Results" }));
-  await page.waitForTimeout(1200);
-  const most = page.getByText("Most voted").first();
-  const m = (await most.boundingBox())!;
-  await page.mouse.move(m.x + 160, m.y + 60, { steps: 25 });
-  await page.waitForTimeout(3600);
+  // Step 4 · Receipt
+  const receipt = page.getByTestId("receipt");
+  await beat(async () => {
+    await expect(receipt).toBeVisible();
+    await page.waitForTimeout(1200); // seal + stamp
+    await smoothTo(page, receipt);
+  });
+  await beat(async () => {
+    const r = (await receipt.boundingBox())!;
+    await page.mouse.move(r.x + r.width * 0.45, r.y + r.height * 0.5, { steps: 30 });
+    await page.waitForTimeout(1500);
+    await page.mouse.move(r.x + r.width * 0.45, r.y + r.height * 0.62, { steps: 30 });
+    await page.waitForTimeout(1500);
+    await glide(page, page.getByTestId("receipt-hash"), 30);
+  });
+  await beat(async () => {
+    const note = page.getByTestId("already-voted");
+    await smoothTo(page, note);
+    await glide(page, note, 30);
+  });
 
+  // Step 5 · Results
+  await beat(() => smoothTo(page, page.getByTestId("results"), "start"));
+  await beat(async () => {
+    await chain.timeTravel(8 * 86_400); // jump past the 7-day deadline
+    await expect(page.getByTestId("winner")).toBeVisible({ timeout: 30_000 });
+    await glide(page, page.getByTestId("winner"), 30);
+  });
+  await beat(async () => {
+    await press(page, nav.getByRole("link", { name: "Results" }));
+    await page.waitForTimeout(800);
+    await page.mouse.move(400, 520, { steps: 40 });
+    await page.mouse.move(900, 520, { steps: 50 });
+  });
+  await beat(async () => {
+    await press(page, nav.getByRole("link", { name: "My votes" }));
+    await page.mouse.move(500, 380, { steps: 40 });
+  });
+
+  // Why trust it
+  await beat(async () => {
+    await press(page, nav.getByRole("link", { name: "Home" }));
+    await page.waitForTimeout(600);
+    await smoothTo(page, page.getByTestId("trust-points"));
+  });
+
+  // End card
+  await page.evaluate(() => document.getElementById("vid-caption")?.remove());
   await endCard(page);
-  await page.waitForTimeout(3600);
+  await beat();
+  await page.waitForTimeout(1200);
+
+  writeFileSync(
+    "test-results/explainer-marks.json",
+    JSON.stringify({ trimStartMs: t0 - bodyStart, marksMs: marks, endMs: Date.now() - t0 }),
+  );
 });

@@ -4,6 +4,7 @@ import { env } from "../config/env";
 import { deployment } from "../contract/contract";
 import { useChainClock } from "../hooks/useChainClock";
 import { LogoMark } from "./LogoMark";
+import { START_TOUR_EVENT } from "./OnboardingTour";
 import { useSoundSetting } from "../hooks/useSound";
 import { unlockAudio } from "../lib/sound";
 
@@ -67,6 +68,21 @@ export function Footer() {
             </a>
           )}
           <a href="/#security">How results are secured</a>
+          <button
+            type="button"
+            className="sound-toggle"
+            onClick={() => {
+              try {
+                localStorage.removeItem("ballot:tour-done");
+              } catch {
+                /* ignore */
+              }
+              window.dispatchEvent(new Event(START_TOUR_EVENT));
+            }}
+            data-testid="take-tour"
+          >
+            Take the tour
+          </button>
           <button
             type="button"
             className="sound-toggle"

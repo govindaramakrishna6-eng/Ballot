@@ -49,9 +49,8 @@ test.describe("Brand intro", () => {
     expect(await res.text()).toContain("<svg");
   });
 
-  test("sound: browsers block autoplay → 'Tap for sound' turns it on without skipping the intro", async ({ page }) => {
+  test("sound: no button — when the browser blocks autoplay, it plays on the first keypress/click", async ({ page }) => {
     await page.addInitScript(() => {
-      // count every sound source the page starts
       (window as never as { __snd: number }).__snd = 0;
       const osc = AudioContext.prototype.createOscillator;
       AudioContext.prototype.createOscillator = function () {
@@ -60,12 +59,11 @@ test.describe("Brand intro", () => {
       };
     });
     await page.goto("/");
-    const intro = page.getByTestId("intro");
-    const tap = page.getByTestId("intro-sound");
-    await expect(tap).toBeVisible();
-    expect(await page.evaluate(() => (window as never as { __snd: number }).__snd)).toBe(0); // silent until a gesture
-    await tap.click();
-    await expect(intro).toBeVisible(); // tapping for sound does not skip
+    await expect(page.getByTestId("intro")).toBeVisible();
+    await expect(page.getByTestId("intro-sound")).toHaveCount(0); // no "Tap for sound" button any more
+    await page.waitForTimeout(400);
+    expect(await page.evaluate(() => (window as never as { __snd: number }).__snd)).toBe(0); // blocked until a gesture
+    await page.keyboard.press("Space");
     await expect.poll(() => page.evaluate(() => (window as never as { __snd: number }).__snd)).toBeGreaterThan(0);
   });
 

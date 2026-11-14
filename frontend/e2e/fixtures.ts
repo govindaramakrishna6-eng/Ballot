@@ -71,6 +71,10 @@ export const test = base.extend<{ wallet: WalletControls; skipIntro: void }>({
       if (!testInfo.file.endsWith("intro.spec.ts")) {
         await page.addInitScript(() => sessionStorage.setItem("ballot:intro-seen", "1"));
       }
+      // Likewise the first-visit guided tour (e2e/tour.spec.ts tests it directly).
+      if (!testInfo.file.endsWith("tour.spec.ts")) {
+        await page.addInitScript(() => localStorage.setItem("ballot:tour-done", "1"));
+      }
       await provide();
     },
     { auto: true },

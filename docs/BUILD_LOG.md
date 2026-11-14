@@ -598,3 +598,24 @@ Files created/changed (paths): frontend/src/index.css, lib/sound.ts, hooks/useSo
 Test/build results (actually observed): vitest 38 passed; tsc OK; oxlint 0 new; E2E 53 passed (1.7m); chart palette validator PASS light + dark.
 Commit made: feat: ballot-sheet backdrop, the logo's green across the app, and an intro sound
 ```
+
+## Owner feedback: calmer backdrop, plain boxes, green wallet button, sound without a button, live block boxes, first-visit tour
+
+Decisions:
+- Backdrop made lighter: 160px tile with only two tick-boxes and a dot, stroke alpha 0.06 light / 0.045 dark. The content has to stand out, not the texture.
+- Receipt and stats are normal card boxes (card colour, ink outline, offset shadow), no dark fill and no perforations, as asked.
+- RainbowKit's connect button uses var(--primary) so the wallet button in the header is the logo's green in both themes.
+- "Tap for sound" removed. Browsers block audio until the visitor interacts, so the intro sound plays straight away when allowed, otherwise on the visitor's first click or keypress (within 12s). There is no button; the footer toggle still turns sound off.
+- Live blocks are back as boxes under the hero: the last 9 blocks, Ballot blocks in green, newest with a live dot, hover or focus shows a tooltip (block number, Ballot votes/polls, tx count, Etherscan link on Sepolia). Phone view shows 5 compact tiles.
+- First-visit tour: an animated pointer with a spotlight walks through Connect wallet → Create a poll → Vote → Results → Live blocks. It shows once per browser (localStorage) and can be replayed from the footer ("Take the tour"). Escape or Skip ends it, and keyboard focus moves to Next.
+
+STATUS REPORT
+Done: all six items above.
+Files created/changed (paths): frontend/src/index.css, main.tsx, pages/Home.tsx, components/{Layout,Footer,IntroSplash,OnboardingTour}.tsx,
+  components/home/{Hero,BlockRibbon}.tsx, e2e/{fixtures,intro.spec,tour.spec}.ts
+How to run or verify: cd frontend && npm run e2e. Open the site in a private window to see the tour.
+Test/build results (actually observed): tsc OK; oxlint 0 new; build OK; E2E 56 passed (1.9m). Hero centred at 1440×900 exactly, 4px off at 390×844 (test tolerance 6).
+Not done / known issues: sound before any interaction depends on the browser's autoplay policy, so it can't be forced.
+Assumptions I made: the tour shows on the homepage only, once per browser.
+What the next phase needs from this one: nothing.
+Commit made: feat: calmer backdrop, plain receipt/stats boxes, green wallet button, live block boxes, first-visit tour

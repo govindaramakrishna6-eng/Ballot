@@ -38,12 +38,12 @@ function paperTheme(base: ReturnType<typeof lightTheme>) {
     ...base,
     colors: {
       ...base.colors,
-      // "Connect Wallet" is a calm ink button — colour is reserved for the primary actions (tomato).
-      accentColor: "var(--ink)",
-      accentColorForeground: "var(--paper)",
+      // The wallet button is filled with the logo's green, like the primary actions.
+      accentColor: "var(--primary)",
+      accentColorForeground: "var(--on-primary)",
       // Field Guide: the "Connect wallet" button is a mint sticker with ink text.
-      connectButtonBackground: "var(--card)",
-      connectButtonText: "var(--ink)",
+      connectButtonBackground: "var(--primary)",
+      connectButtonText: "var(--on-primary)",
       connectButtonInnerBackground: "var(--card)",
     },
     shadows: { ...base.shadows, connectButton: "0 0 0 2px var(--edge), 3px 3px 0 2px var(--shadow-color)", dialog: "none", profileDetailsAction: "none", selectedOption: "none", selectedWallet: "none", walletLogo: "none" },

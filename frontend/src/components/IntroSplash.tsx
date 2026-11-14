@@ -24,16 +24,24 @@ function alreadySeen(): boolean {
 export function IntroSplash() {
   const reduce = useReducedMotion();
   const [phase, setPhase] = useState<"play" | "exit" | "done">(() => (alreadySeen() ? "done" : "play"));
-  // Browsers block sound until the visitor interacts; if that happens we offer a small "Tap for sound".
-  const [needsTap, setNeedsTap] = useState(false);
 
   useEffect(() => {
     if (phase !== "play" || !soundEnabled()) return;
     let cancelled = false;
+    const start = performance.now();
+    // Browsers block sound until the visitor first clicks/taps/types. If that's the case, there is no
+    // button: the sound simply plays on that first gesture (the "drop + seal" part), as long as it
+    // comes within a few seconds of arriving — never as a surprise much later.
+    const onFirstGesture = () => {
+      void unlockAudio().then((ok) => ok && performance.now() - start < 12_000 && playLand());
+    };
     void unlockAudio().then((running) => {
       if (cancelled) return;
       if (running) playIntro();
-      else setNeedsTap(true);
+      else {
+        window.addEventListener("pointerdown", onFirstGesture, { once: true });
+        window.addEventListener("keydown", onFirstGesture, { once: true });
+      }
     });
     return () => {
       cancelled = true;
@@ -76,25 +84,6 @@ export function IntroSplash() {
         <p className="intro-word">Ballot</p>
         <p className="intro-tag">Verifiable, tamper‑proof voting</p>
       </div>
-      {needsTap && phase === "play" && (
-        <button
-          type="button"
-          className="intro-sound"
-          data-testid="intro-sound"
-          // Enables sound without skipping the intro (the backdrop's tap would skip it).
-          onPointerDown={(e) => {
-            e.stopPropagation();
-            void unlockAudio().then((ok) => ok && playLand());
-            setNeedsTap(false);
-          }}
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" />
-            <path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" />
-          </svg>
-          Tap for sound
-        </button>
-      )}
       <p className="intro-skip">Tap or press any key to skip</p>
     </div>
   );

@@ -8,6 +8,7 @@ import { LiveTicker } from "./LiveTicker";
 import { LogoMark } from "./LogoMark";
 import { NetworkBanner } from "./NetworkBanner";
 import { NoWalletHint } from "./NoWalletHint";
+import { OnboardingTour } from "./OnboardingTour";
 import { Toaster } from "./Toaster";
 
 const LINKS = [
@@ -86,6 +87,7 @@ export function Layout() {
       <Footer />
       <Toaster />
       <IntroSplash />
+      <OnboardingTour />
     </div>
   );
 }

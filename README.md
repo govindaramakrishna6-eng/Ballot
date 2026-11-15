@@ -14,6 +14,19 @@ from the blockchain, not from this website, so it is proof rather than decoratio
 
 ![Homepage](docs/screenshots/home-light.png)
 
+## Watch the 2-minute explainer
+
+[![Ballot explained in 2 minutes: click to play](frontend/public/explainer-poster.jpg)](docs/ballot-explainer.mp4)
+
+A narrated walkthrough, with captions, of the whole journey: connect a wallet, create a poll, vote, get the ballot receipt,
+and watch the poll close with a winner. Click the image to play it here on GitHub, or watch it on the live site's
+[Watch page](https://ballot-omega.vercel.app/watch).
+
+- Video file: [`docs/ballot-explainer.mp4`](docs/ballot-explainer.mp4) (1:59, 1280×720, H.264 + AAC)
+- Captions: [`docs/ballot-voiceover.srt`](docs/ballot-voiceover.srt)
+- It was recorded from the real app on a local test chain, so the receipt shows "Hardhat Local" instead of Sepolia.
+  To re-record it after changing the app, see "Explainer video" in [`docs/BUILD_LOG.md`](docs/BUILD_LOG.md).
+
 ---
 
 ## How it works, in plain English
